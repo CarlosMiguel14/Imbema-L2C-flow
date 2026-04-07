@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imbema — CRM & Sales Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#002147;--navy-mid:#1B4F84;--navy-light:#2E75B6;
+  --bl:#00AEEF;--bl-dim:#E6F6FD;
+  --bg:#F4F7FB;--surface:#fff;--border:#DDE6F0;
+  --text:#1A2E42;--muted:#5A7A96;
+  --success:#0A6640;--success-bg:#E6F4EE;
+  --warn:#7A4F00;--warn-bg:#FFF3CD;
+  --info-bg:#E6F1FB;--info:#0C447C;
+  --danger:#A32D2D;--danger-bg:#FCEBEB;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,33,71,.08),0 4px 16px rgba(0,33,71,.06);
+  --shadow-sm:0 1px 3px rgba(0,33,71,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
+
+.topbar{background:var(--navy);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:200;border-bottom:3px solid var(--bl)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--bl)}
+.logo-text{font-size:15px;font-weight:600;color:#fff}
+.logo-sub{font-size:11px;color:rgba(255,255,255,.45);font-weight:300}
+.topbar-right{font-size:11px;color:rgba(255,255,255,.4)}
+
+.nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 2rem;position:sticky;top:54px;z-index:100}
+.nav-btn{padding:10px 20px;font-size:13px;font-weight:500;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;margin-bottom:-1px;transition:color .15s,border-color .15s}
+.nav-btn.active{color:var(--navy);border-bottom-color:var(--bl)}
+.nav-btn:hover:not(.active){color:var(--text)}
+.nav-badge{display:inline-block;background:var(--bl-dim);color:var(--navy-mid);font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;margin-left:5px}
+
+.main{max-width:1200px;margin:0 auto;padding:2rem}
+
+.page{display:none}
+.page.active{display:block}
+
+.panel{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:1.25rem}
+.panel:last-child{margin-bottom:0}
+.panel-hdr{background:var(--navy);padding:.8rem 1.25rem;display:flex;align-items:center;gap:8px}
+.panel-dot{width:7px;height:7px;border-radius:50%;background:var(--bl);flex-shrink:0}
+.panel-hdr h2{font-size:12px;font-weight:500;color:#fff;letter-spacing:.05em;text-transform:uppercase}
+.panel-body{padding:1.25rem}
+
+.field{margin-bottom:1rem}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;padding:0 10px;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--bl);box-shadow:0 0 0 3px rgba(0,174,239,.1)}
+.field textarea{height:auto;min-height:72px;padding:8px 10px;resize:vertical}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A7A96' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s,transform .1s;white-space:nowrap}
+.btn:hover{background:var(--bg);border-color:var(--navy-light)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn.primary:hover{background:#001535}
+.btn.accent{background:var(--bl);color:var(--navy);border-color:var(--bl);font-weight:600}
+.btn.accent:hover{background:#009ed4}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn.danger{border-color:var(--danger);color:var(--danger)}
+.btn.danger:hover{background:var(--danger-bg)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px}
+.badge-nieuw{background:var(--bl-dim);color:var(--navy-mid)}
+.badge-gekwalificeerd{background:#EBF0FA;color:var(--navy-mid)}
+.badge-schouw{background:#FFF3CD;color:#7A4F00}
+.badge-voorstel{background:#E6F1FB;color:#185FA5}
+.badge-gesloten-won{background:var(--success-bg);color:var(--success)}
+.badge-verloren{background:var(--danger-bg);color:var(--danger)}
+
+.data-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+.data-row:last-child{border-bottom:none}
+.data-row .lbl{color:var(--muted)}
+.data-row .val{font-weight:500;color:var(--text);text-align:right;max-width:60%}
+
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1rem;box-shadow:var(--shadow-sm)}
+.kpi-card.accent{background:var(--navy);border-color:var(--navy)}
+.kpi-label{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.kpi-card.accent .kpi-label{color:rgba(255,255,255,.45)}
+.kpi-value{font-size:22px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace;line-height:1}
+.kpi-card.accent .kpi-value{color:#fff}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.kpi-card.accent .kpi-sub{color:rgba(255,255,255,.35)}
+
+.pipeline{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+.pipe-col{flex:0 0 190px;background:var(--bg);border-radius:var(--radius);padding:10px;border:1px solid var(--border)}
+.pipe-col-hdr{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.pipe-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 11px;margin-bottom:6px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.pipe-card:hover{border-color:var(--bl);box-shadow:var(--shadow-sm)}
+.pipe-card .pc-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.pipe-card .pc-meta{font-size:11px;color:var(--muted);margin-bottom:5px}
+
+.lead-table{width:100%;border-collapse:collapse}
+.lead-table th{text-align:left;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg)}
+.lead-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.lead-table tr:last-child td{border-bottom:none}
+.lead-table tr:hover td{background:var(--bg);cursor:pointer}
+
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--navy-mid);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,33,71,.2);cursor:pointer;transition:background .15s,transform .1s}
+input[type=range]:hover::-webkit-slider-thumb{background:var(--bl);transform:scale(1.1)}
+
+.verdict-box{border-radius:var(--radius-sm);padding:.9rem 1.1rem;margin-bottom:1rem}
+
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-row:last-child{margin-bottom:0}
+.bar-lbl{font-size:12px;color:var(--muted);width:100px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:22px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 9px;transition:width .5s cubic-bezier(.4,0,.2,1);min-width:50px}
+.bar-val{font-size:11px;font-weight:600;color:#fff;font-family:'DM Mono',monospace;white-space:nowrap}
+
+.tl-row{display:grid;grid-template-columns:52px 1fr 84px;gap:8px;align-items:center;margin-bottom:6px}
+.tl-row:last-child{margin-bottom:0}
+.tl-lbl{font-size:12px;color:var(--muted);font-weight:500}
+.tl-track{height:16px;background:var(--bg);border-radius:3px;overflow:hidden;border:1px solid var(--border)}
+.tl-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.tl-val{font-size:12px;font-weight:600;font-family:'DM Mono',monospace;text-align:right}
+
+.erp-task{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;transition:background .15s}
+.erp-task.done{background:var(--bg)}
+.erp-task input[type=checkbox]{width:16px;height:16px;cursor:pointer;flex-shrink:0;accent-color:var(--navy)}
+.erp-task .t-text{flex:1;font-size:13px;color:var(--text)}
+.erp-task.done .t-text{text-decoration:line-through;color:var(--muted)}
+.erp-task .t-owner{font-size:11px;color:var(--muted);white-space:nowrap}
+
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-bottom:1rem;overflow:hidden}
+.progress-fill{height:100%;background:var(--bl);border-radius:3px;transition:width .4s ease}
+
+.section-lbl{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
+
+.flow-link{display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}
+.flow-link .arrow{color:var(--bl);font-size:18px;flex-shrink:0}
+.flow-link .fl-title{font-size:13px;font-weight:500;color:var(--text)}
+.flow-link .fl-sub{font-size:11px;color:var(--muted)}
+.flow-link .fl-btn{margin-left:auto;flex-shrink:0}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;border-left:4px solid var(--bl);z-index:9999;transform:translateY(80px);opacity:0;transition:transform .3s,opacity .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.divider{height:1px;background:var(--border);margin:1rem 0}
+
+.pipe-card[draggable]{cursor:grab}
+.pipe-card[draggable]:active{cursor:grabbing}
+.pipe-card.dragging{opacity:.4;transform:scale(.97)}
+.pipe-col.drag-over{background:#E6F6FD;border-color:var(--bl)}
+.pipe-col.drag-over .pipe-col-hdr{color:var(--navy)}
+
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm)}
+.chart-title{font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.bar-h{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.bar-h:last-child{margin-bottom:0}
+.bar-h-lbl{font-size:12px;color:var(--muted);width:120px;flex-shrink:0;text-align:right}
+.bar-h-track{flex:1;height:20px;background:var(--bg);border-radius:3px;overflow:hidden;border:1px solid var(--border)}
+.bar-h-fill{height:100%;border-radius:3px;transition:width .5s ease;display:flex;align-items:center;padding:0 7px}
+.bar-h-val{font-size:11px;font-weight:600;color:#fff;font-family:'DM Mono',monospace;white-space:nowrap}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.stat-row:last-child{border-bottom:none}
+
+@media(max-width:900px){.grid2,.grid3,.grid4{grid-template-columns:1fr}.main{padding:1rem}}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN OVERLAY ══════════════════════════════════════════════════════ -->
+<div id="login-overlay" style="
+  position:fixed;inset:0;background:#002147;z-index:9999;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  font-family:'DM Sans',sans-serif">
+
+  <!-- Logo -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:2.5rem">
+    <div style="width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center">
+      <div style="width:16px;height:16px;border-radius:50%;background:#00AEEF"></div>
+    </div>
+    <div>
+      <div style="font-size:24px;font-weight:600;color:#fff;letter-spacing:.01em">imbema</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.45);font-weight:300">CRM &amp; Sales Tool</div>
+    </div>
+  </div>
+
+  <!-- Login card -->
+  <div style="background:#fff;border-radius:16px;padding:2rem 2.25rem;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.3)">
+    <div style="font-size:18px;font-weight:500;color:#002147;margin-bottom:.25rem">Inloggen</div>
+    <div style="font-size:13px;color:#5A7A96;margin-bottom:1.5rem">Alleen voor Imbema-medewerkers</div>
+
+    <div style="margin-bottom:1rem">
+      <label style="display:block;font-size:12px;color:#5A7A96;margin-bottom:5px">Gebruikersnaam</label>
+      <input id="login-user" type="text" placeholder="gebruikersnaam" autocomplete="username"
+        style="width:100%;height:42px;border:1px solid #DDE6F0;border-radius:8px;background:#F4F7FB;
+               color:#1A2E42;font-size:14px;font-family:'DM Sans',sans-serif;padding:0 12px;
+               outline:none;transition:border-color .15s"
+        onfocus="this.style.borderColor='#00AEEF';this.style.boxShadow='0 0 0 3px rgba(0,174,239,.12)'"
+        onblur="this.style.borderColor='#DDE6F0';this.style.boxShadow='none'"
+        onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+    </div>
+
+    <div style="margin-bottom:1rem">
+      <label style="display:block;font-size:12px;color:#5A7A96;margin-bottom:5px">Wachtwoord</label>
+      <div style="position:relative">
+        <input id="login-pass" type="password" placeholder="wachtwoord" autocomplete="current-password"
+          style="width:100%;height:42px;border:1px solid #DDE6F0;border-radius:8px;background:#F4F7FB;
+                 color:#1A2E42;font-size:14px;font-family:'DM Sans',sans-serif;padding:0 42px 0 12px;
+                 outline:none;transition:border-color .15s"
+          onfocus="this.style.borderColor='#00AEEF';this.style.boxShadow='0 0 0 3px rgba(0,174,239,.12)'"
+          onblur="this.style.borderColor='#DDE6F0';this.style.boxShadow='none'"
+          onkeydown="if(event.key==='Enter')doLogin()">
+        <button onclick="togglePw()" tabindex="-1"
+          style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+                 background:none;border:none;cursor:pointer;color:#5A7A96;font-size:16px;padding:0;line-height:1"
+          title="Toon/verberg wachtwoord" id="pw-eye">&#128065;</button>
+      </div>
+    </div>
+
+    <div id="login-error" style="display:none;background:#FCEBEB;color:#A32D2D;font-size:12px;
+      padding:8px 12px;border-radius:6px;margin-bottom:1rem;border-left:3px solid #A32D2D">
+      Onjuiste gebruikersnaam of wachtwoord.
+    </div>
+
+    <button onclick="doLogin()"
+      style="width:100%;height:44px;background:#002147;color:#fff;border:none;border-radius:8px;
+             font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;
+             transition:background .15s"
+      onmouseover="this.style.background='#001535'" onmouseout="this.style.background='#002147'">
+      Inloggen
+    </button>
+
+    <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #DDE6F0;font-size:11px;color:#5A7A96;text-align:center">
+      Toegangsproblemen? Neem contact op met je manager.
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem;font-size:11px;color:rgba(255,255,255,.25)">
+    Imbema Asset Solutions &nbsp;·&nbsp; Intern gebruik
+  </div>
+</div>
+<!-- ══ EINDE LOGIN ════════════════════════════════════════════════════════ -->
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon"><div class="logo-dot"></div></div>
+    <div>
+      <div class="logo-text">imbema</div>
+      <div class="logo-sub">Asset Solutions</div>
+    </div>
+  </div>
+  <div class="topbar-right" id="topbar-info" style="display:flex;align-items:center;gap:12px">
+    <span style="color:rgba(255,255,255,.35);font-size:11px">Ingelogd als: <strong id="topbar-user" style="color:#00AEEF"></strong></span>
+    <button onclick="doLogout()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:11px;font-family:'DM Sans',sans-serif;padding:4px 10px;border-radius:6px;cursor:pointer" onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">Uitloggen</button>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showPage('pipeline',this)">Pipeline <span class="nav-badge" id="badge-pipeline">0</span></button>
+  <button class="nav-btn" onclick="showPage('lead',this)">Lead / offerte</button>
+  <button class="nav-btn" onclick="showPage('schouwform',this)">Schouwformulier</button>
+  <button class="nav-btn" onclick="showPage('roi',this)">ROI calculator</button>
+  <button class="nav-btn" onclick="showPage('erp',this)">ERP order</button>
+  <button class="nav-btn" onclick="showPage('rapport',this);buildRapport()">Rapportages</button>
+  <button class="nav-btn" onclick="showPage('support',this)">Support / uitleg</button>
+</div>
+
+<div class="main">
+
+<!-- ══════════════ PIPELINE ══════════════ -->
+<div id="page-pipeline" class="page active">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+    <div>
+      <div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:2px">Actieve pipeline</div>
+      <div style="font-size:13px;color:var(--muted)">Klik op een lead om te openen</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="toggleView()">Tabelweergave</button>
+      <button class="btn primary" onclick="newLead()">+ Nieuwe lead</button>
+    </div>
+  </div>
+
+  <div class="grid4" style="margin-bottom:1.5rem">
+    <div class="kpi-card"><div class="kpi-label">Totaal leads</div><div class="kpi-value" id="k-total">0</div><div class="kpi-sub">actief in pipeline</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pipeline waarde</div><div class="kpi-value" id="k-value">€ —</div><div class="kpi-sub">indicatief</div></div>
+    <div class="kpi-card"><div class="kpi-label">Gesloten</div><div class="kpi-value" id="k-orders">0</div><div class="kpi-sub">gewonnen deals</div></div>
+    <div class="kpi-card accent"><div class="kpi-label">Voorstel uitgebracht</div><div class="kpi-value" id="k-erp">0</div><div class="kpi-sub">wacht op beslissing</div></div>
+  </div>
+
+  <div id="pipeline-view">
+    <div class="pipeline" id="pipeline-board"></div>
+  </div>
+
+  <div id="table-view" style="display:none">
+    <div class="panel">
+      <div class="panel-body" style="padding:0">
+        <table class="lead-table" id="lead-table">
+          <thead>
+            <tr>
+              <th>Bedrijf</th><th>Contactpersoon</th><th>Sector</th><th>Meetpunten</th><th>Status</th><th>Volgende actie</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="lead-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ LEAD ══════════════ -->
+<div id="page-lead" class="page">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+    <div>
+      <div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:2px" id="lead-page-title">Nieuwe lead</div>
+      <div style="font-size:13px;color:var(--muted)">Data wordt automatisch doorgestuurd naar ROI-calculator en ERP-order</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="deleteLead()" id="btn-delete" style="display:none">Verwijder lead</button>
+      <button class="btn" onclick="newLead()">Nieuwe lead</button>
+      <button class="btn primary" onclick="saveLead()">Opslaan</button>
+    </div>
+  </div>
+
+  <div class="grid2" style="align-items:start">
+    <div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Klantgegevens</h2></div>
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Bedrijfsnaam *</label><input id="f-company" placeholder="bijv. DUWO" oninput="liveSync()"></div>
+            <div class="field"><label>Contactpersoon</label><input id="f-contact" placeholder="Naam" oninput="liveSync()"></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Functie</label><input id="f-role" placeholder="bijv. Facilitair Manager" oninput="liveSync()"></div>
+            <div class="field"><label>Telefoon</label><input id="f-phone" placeholder="+31 6..." oninput="liveSync()"></div>
+          </div>
+          <div class="field"><label>E-mail</label><input id="f-email" placeholder="naam@bedrijf.nl" oninput="liveSync()"></div>
+          <div class="field"><label>Adres / locatie</label><input id="f-adres" placeholder="bijv. Amsterdam" oninput="liveSync()"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Projectdetails</h2></div>
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Sector</label>
+              <select id="f-sector" onchange="liveSync()">
+                <option value="zorg">Zorginstelling / onderwijs</option>
+                <option value="vastgoed">Vastgoed / multi-tenant</option>
+                <option value="recreatie">Recreatiepark</option>
+                <option value="industrie">Industrie (food/chemie)</option>
+                <option value="logistiek">Logistiek / distributie</option>
+              </select>
+            </div>
+            <div class="field"><label>Status</label>
+              <select id="f-status" onchange="liveSync()">
+                <option value="nieuw">Nieuw</option>
+                <option value="gekwalificeerd">Gekwalificeerd — behoefte bevestigd</option>
+                <option value="schouw">Schouw gedaan / ROI gereed</option>
+                <option value="voorstel">Voorstel uitgebracht</option>
+                <option value="gesloten-won">Gesloten — gewonnen</option>
+                <option value="verloren">Verloren</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Aantal locaties</label><input id="f-locaties" type="number" placeholder="bijv. 3" oninput="liveSync()"></div>
+            <div class="field"><label>Geschat meetpunten</label><input id="f-meetpunten" type="number" placeholder="bijv. 20" oninput="liveSync()"></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Jaarverbruik (MWh)</label><input id="f-mwh" type="number" placeholder="bijv. 600" oninput="liveSync()"></div>
+            <div class="field"><label>Indicatieve orderwaarde (€)</label><input id="f-orderwaarde" type="number" placeholder="bijv. 25000" oninput="liveSync()"></div>
+          </div>
+          <div class="field"><label>Energiedrager(s)</label>
+            <select id="f-media" onchange="liveSync()">
+              <option value="elektra">Elektra</option>
+              <option value="gas">Gas</option>
+              <option value="warmte">Warmte</option>
+              <option value="water">Water</option>
+              <option value="multi">Multi-media (combinatie)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Notities &amp; opvolging</h2></div>
+        <div class="panel-body">
+          <div class="field"><label>Notitie</label><textarea id="f-note" placeholder="Wat besproken, pijnpunten, context..." oninput="liveSync()"></textarea></div>
+          <div class="grid2">
+            <div class="field"><label>Volgende actie</label><input id="f-next" placeholder="bijv. Bel volgende week" oninput="liveSync()"></div>
+            <div class="field"><label>Datum</label><input id="f-date" type="date" oninput="liveSync()"></div>
+          </div>
+          <div class="field"><label>Bron / hoe binnengekregen</label>
+            <select id="f-bron" onchange="liveSync()">
+              <option value="">— Selecteer bron —</option>
+              <option value="linkedin">LinkedIn</option>
+              <option value="referral">Referral / doorverwijzing</option>
+              <option value="event">Event / beurs</option>
+              <option value="inbound">Inbound (website/mail)</option>
+              <option value="outbound">Outbound (cold)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Doorsturen</h2></div>
+        <div class="panel-body">
+          <div class="flow-link">
+            <div class="arrow" style="color:#BA7517">&#8594;</div>
+            <div>
+              <div class="fl-title">Schouwformulier</div>
+              <div class="fl-sub">Meetpunten, media en technische inventarisatie</div>
+            </div>
+            <button class="btn sm fl-btn" onclick="saveLead();loadSchouwData(currentId);showPage('schouwform',document.querySelectorAll('.nav-btn')[2])">Open schouw</button>
+          </div>
+          <div class="flow-link">
+            <div class="arrow">&#8594;</div>
+            <div>
+              <div class="fl-title">ROI-calculator</div>
+              <div class="fl-sub">Klantdata al ingevuld — alleen sliders aanpassen</div>
+            </div>
+            <button class="btn accent sm fl-btn" onclick="goROI()">Open ROI</button>
+          </div>
+          <div class="flow-link">
+            <div class="arrow" style="color:#3B6D11">&#8594;</div>
+            <div>
+              <div class="fl-title">ERP-order</div>
+              <div class="fl-sub">Klant + ROI-resultaat meegenomen</div>
+            </div>
+            <button class="btn sm fl-btn" onclick="goERP()">Open ERP</button>
+          </div>
+          <div class="flow-link">
+            <div class="arrow" style="color:#7A4F00">&#8594;</div>
+            <div>
+              <div class="fl-title">Externe ROI-calculator</div>
+              <div class="fl-sub">Los te gebruiken tool (apart bestand)</div>
+            </div>
+            <a class="btn sm fl-btn" href="imbema_roi_calculator.html" target="_blank">Open</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ROI ══════════════ -->
+<div id="page-roi" class="page">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+    <div>
+      <div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:2px">ROI-calculator — volledig</div>
+      <div style="font-size:13px;color:var(--muted)">Klantdata overgenomen · kWh/MWh · scenario-analyse · benchmark · maandelijks overzicht</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="roiSaveHTML()">Opslaan als HTML</button>
+      <button class="btn primary" onclick="saveROI()">Opslaan in dossier</button>
+    </div>
+  </div>
+
+  <div class="grid2" style="align-items:start">
+    <div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Klantprofiel <span style="font-size:10px;color:var(--bl);font-weight:400;text-transform:none;letter-spacing:0">(overgenomen)</span></h2></div>
+        <div class="panel-body">
+          <div class="data-row"><span class="lbl">Bedrijf</span><span class="val" id="r-company">—</span></div>
+          <div class="data-row"><span class="lbl">Contactpersoon</span><span class="val" id="r-contact">—</span></div>
+          <div class="data-row"><span class="lbl">Sector</span><span class="val" id="r-sector">—</span></div>
+          <div class="data-row"><span class="lbl">Meetpunten</span><span class="val" id="r-meetpunten">—</span></div>
+          <div class="data-row"><span class="lbl">Verbruik</span><span class="val" id="r-mwh">—</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Energieprofiel</h2></div>
+        <div class="panel-body">
+          <div class="field">
+            <label style="font-size:12px;color:var(--muted);margin-bottom:5px;display:block">Eenheid voor verbruik &amp; prijs</label>
+            <div style="display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden">
+              <button id="roi-btn-kwh" onclick="roiSetUnit('kwh')" style="flex:1;padding:7px 0;font-size:12px;font-weight:500;background:#002147;color:#fff;border:none;cursor:pointer">kWh &amp; €/kWh</button>
+              <button id="roi-btn-mwh" onclick="roiSetUnit('mwh')" style="flex:1;padding:7px 0;font-size:12px;font-weight:500;background:var(--bg);color:var(--muted);border:none;cursor:pointer">MWh &amp; €/MWh</button>
+            </div>
+          </div>
+          <div class="field">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <label id="roi-cons-lbl" style="font-size:12px;color:var(--muted)">Jaarlijks energieverbruik (kWh)</label>
+              <strong id="roi-v-cons" style="font-size:13px;color:#1B4F84;font-family:'DM Mono',monospace">500.000 kWh</strong>
+            </div>
+            <input type="range" id="roi-s-cons" min="1" max="1000" step="1" value="500" oninput="calcROI()">
+            <div id="roi-h-cons" style="font-size:11px;color:var(--muted);margin-top:4px;font-style:italic">= 500 MWh</div>
+          </div>
+          <div class="field">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <label id="roi-price-lbl" style="font-size:12px;color:var(--muted)">Energieprijs (€/kWh)</label>
+              <strong id="roi-v-price" style="font-size:13px;color:#1B4F84;font-family:'DM Mono',monospace">€ 0,12</strong>
+            </div>
+            <input type="range" id="roi-s-price" min="1" max="300" step="1" value="12" oninput="calcROI()">
+            <div id="roi-h-price" style="font-size:11px;color:var(--muted);margin-top:4px;font-style:italic">Incl. netkosten &amp; belastingen. Normaal ≈ €0,11–0,15/kWh</div>
+          </div>
+          <div class="divider"></div>
+          <div class="field">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <label style="font-size:12px;color:var(--muted)">Verwachte besparing door inzicht</label>
+              <strong id="roi-v-saving" style="font-size:13px;color:#1B4F84;font-family:'DM Mono',monospace">10%</strong>
+            </div>
+            <input type="range" id="roi-s-saving" min="1" max="30" step="1" value="10" oninput="calcROI()">
+          </div>
+          <div style="background:#E6F6FD;border-radius:var(--radius-sm);padding:.7rem 1rem;border-left:3px solid #00AEEF">
+            <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Indicatieve uitsplitsing besparing</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#1B4F84;margin-bottom:3px"><span>Stand-by / nachtverbruik</span><span id="roi-sb1">—</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#1B4F84;margin-bottom:3px"><span>Lekverliezen (stoom, perslucht)</span><span id="roi-sb2">—</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#1B4F84;margin-bottom:3px"><span>Piekbelasting afvlakken</span><span id="roi-sb3">—</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:#1B4F84;border-top:1px solid rgba(0,174,239,.2);padding-top:4px;margin-top:4px"><span>Totale energiebesparing / jaar</span><span id="roi-sbt">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Projectconfiguratie</h2></div>
+        <div class="panel-body">
+          <div class="field">
+            <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block">Aantal meetpunten — <strong id="roi-v-meters">20</strong></label>
+            <input type="range" id="roi-s-meters" min="1" max="200" step="1" value="20" oninput="calcROI()">
+          </div>
+          <div class="field">
+            <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block">As-a-Service pakket</label>
+            <select id="roi-s-pkg" onchange="calcROI()">
+              <option value="inzicht">Inzicht — €299/mnd</option>
+              <option value="controle" selected>Controle — €599/mnd</option>
+              <option value="partner">Partner — maatwerk</option>
+            </select>
+          </div>
+          <div class="field">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <label style="font-size:12px;color:var(--muted)">Installatiekosten (eenmalig)</label>
+              <strong id="roi-v-install" style="font-size:13px;color:#1B4F84;font-family:'DM Mono',monospace">€ 25.000</strong>
+            </div>
+            <input type="range" id="roi-s-install" min="1000" max="150000" step="500" value="25000" oninput="calcROI()">
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;font-style:italic">Hardware, engineering, installatie en inbedrijfstelling.</div>
+          </div>
+          <div class="field">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <label style="font-size:12px;color:var(--muted)">Maandelijkse SLA / licentie</label>
+              <strong id="roi-v-monthly" style="font-size:13px;color:#1B4F84;font-family:'DM Mono',monospace">€ 599</strong>
+            </div>
+            <input type="range" id="roi-s-monthly" min="99" max="3000" step="50" value="599" oninput="calcROI()">
+          </div>
+          <div class="divider"></div>
+          <div class="field">
+            <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block">Netcongestie-risico waarde</label>
+            <select id="roi-s-grid" onchange="calcROI()">
+              <option value="0">Geen — niet van toepassing</option>
+              <option value="5000">Laag — ± €5.000/jr</option>
+              <option value="15000" selected>Middel — ± €15.000/jr</option>
+              <option value="30000">Hoog — ± €30.000/jr</option>
+              <option value="60000">Kritisch — ± €60.000/jr</option>
+            </select>
+          </div>
+          <div class="field">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <label style="font-size:12px;color:var(--muted)">EED / CSRD compliance-waarde</label>
+              <strong id="roi-v-comp" style="font-size:13px;color:#1B4F84;font-family:'DM Mono',monospace">€ 5.000</strong>
+            </div>
+            <input type="range" id="roi-s-comp" min="0" max="30000" step="500" value="5000" oninput="calcROI()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div id="roi-badge" style="display:inline-block;background:#E6F6FD;color:#1B4F84;font-size:11px;font-weight:600;padding:3px 12px;border-radius:12px;margin-bottom:1rem">Zorg &amp; Onderwijs</div>
+
+      <div class="grid4" style="margin-bottom:1rem">
+        <div class="kpi-card"><div class="kpi-label">Jaarlijkse besparing</div><div class="kpi-value" id="rr-saving">—</div><div class="kpi-sub">energie + overig</div></div>
+        <div class="kpi-card"><div class="kpi-label">Investering jaar 1</div><div class="kpi-value" id="rr-invest">—</div><div class="kpi-sub">installatie + SLA</div></div>
+        <div class="kpi-card"><div class="kpi-label">Terugverdientijd</div><div class="kpi-value" id="rr-payback">—</div><div class="kpi-sub">break-even</div></div>
+        <div class="kpi-card accent"><div class="kpi-label">3-jaar voordeel</div><div class="kpi-value" id="rr-npv">—</div><div class="kpi-sub">na alle kosten</div></div>
+      </div>
+
+      <div id="roi-verdict" style="border-radius:var(--radius-sm);padding:.9rem 1.1rem;display:flex;align-items:flex-start;gap:10px;margin-bottom:1rem;background:var(--bg)"></div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Cumulatief rendement (5 jaar)</h2></div>
+        <div class="panel-body" id="roi-cashflow"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div class="panel" style="margin-bottom:0">
+          <div class="panel-hdr"><div class="panel-dot"></div><h2>Verdeling baten</h2></div>
+          <div class="panel-body" id="roi-baten"></div>
+        </div>
+        <div class="panel" style="margin-bottom:0">
+          <div class="panel-hdr"><div class="panel-dot"></div><h2>Kostenstructuur jaar 1</h2></div>
+          <div class="panel-body" id="roi-kosten"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Scenario-analyse</h2></div>
+        <div class="panel-body" style="padding:0;overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:12px" id="roi-scen-tbl">
+            <thead><tr>
+              <th style="background:#002147;color:#fff;padding:8px 12px;text-align:left;font-weight:500;font-size:11px">Scenario</th>
+              <th style="background:#002147;color:#fff;padding:8px 12px;text-align:right;font-weight:500;font-size:11px">Besparing</th>
+              <th style="background:#002147;color:#fff;padding:8px 12px;text-align:right;font-weight:500;font-size:11px">Energie/jr</th>
+              <th style="background:#002147;color:#fff;padding:8px 12px;text-align:right;font-weight:500;font-size:11px">Totaal/jr</th>
+              <th style="background:#002147;color:#fff;padding:8px 12px;text-align:right;font-weight:500;font-size:11px">Terugverdientijd</th>
+              <th style="background:#002147;color:#fff;padding:8px 12px;text-align:right;font-weight:500;font-size:11px">3-jr netto</th>
+            </tr></thead>
+            <tbody id="roi-scen-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Benchmark — uw situatie vs. sector gemiddelden</h2></div>
+        <div class="panel-body" id="roi-bench"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Maandelijkse kosten — voor vs. na implementatie</h2></div>
+        <div class="panel-body" id="roi-monthly-chart"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SCHOUWFORMULIER ══════════════ -->
+<div id="page-schouwform" class="page">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+    <div>
+      <div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:2px">Schouwformulier — tussenbemetering</div>
+      <div style="font-size:13px;color:var(--muted)" id="schouw-lead-name">Selecteer eerst een lead via de Pipeline of Lead-tab</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="printSchouw()">Afdrukken / PDF</button>
+      <button class="btn primary" onclick="saveSchouw()">Schouw opslaan</button>
+    </div>
+  </div>
+
+  <!-- Voortgangsbalk -->
+  <div style="display:flex;gap:6px;margin-bottom:1.5rem;align-items:center">
+    <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div id="schouw-prog-bar" style="height:100%;background:#00AEEF;border-radius:3px;transition:width .4s ease;width:0%"></div></div>
+    <span style="font-size:11px;color:var(--muted);white-space:nowrap" id="schouw-prog-label">0% ingevuld</span>
+  </div>
+
+  <div class="grid2" style="align-items:start;gap:1.25rem">
+
+    <!-- LINKER KOLOM -->
+    <div>
+
+      <!-- 1. Gebouw & locatie -->
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>1 — Gebouw &amp; locatie</h2></div>
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Type gebouw</label>
+              <select id="sc-gebouwtype" onchange="schouwSync()">
+                <option value="">— Selecteer —</option>
+                <option>Kantoor</option><option>Zorginstelling</option><option>Wooncomplex / VvE</option>
+                <option>Recreatiepark / vakantiepark</option><option>Fabriek / industrie</option>
+                <option>Distributiecentrum / logistiek</option><option>Winkelcentrum / retail</option>
+                <option>School / onderwijsinstelling</option><option>Hotel / horeca</option><option>Anders</option>
+              </select>
+            </div>
+            <div class="field"><label>Bouwjaar (ca.)</label>
+              <input id="sc-bouwjaar" placeholder="bijv. 1985" oninput="schouwSync()">
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Aantal verdiepingen</label>
+              <input id="sc-verdiepingen" type="number" placeholder="bijv. 4" oninput="schouwSync()">
+            </div>
+            <div class="field"><label>Aantal units / huurders / afdelingen</label>
+              <input id="sc-units" type="number" placeholder="bijv. 12" oninput="schouwSync()">
+            </div>
+          </div>
+          <div class="field"><label>Adres schouwlocatie</label>
+            <input id="sc-adres" placeholder="Straat, postcode, stad" oninput="schouwSync()">
+          </div>
+          <div class="field"><label>Opmerkingen gebouw</label>
+            <textarea id="sc-gebouw-opmerking" placeholder="Bijzonderheden, renovatiehistorie, meerdere gebouwdelen..." oninput="schouwSync()"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Aanwezige energiemedia -->
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>2 — Aanwezige energiemedia</h2></div>
+        <div class="panel-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg)" id="lbl-elektra">
+              <input type="checkbox" id="sc-elektra" onchange="schouwSync();toggleMedia('elektra')" style="width:16px;height:16px;accent-color:#002147;cursor:pointer">
+              <span>Elektra</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg)" id="lbl-gas">
+              <input type="checkbox" id="sc-gas" onchange="schouwSync();toggleMedia('gas')" style="width:16px;height:16px;accent-color:#002147;cursor:pointer">
+              <span>Gas</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg)" id="lbl-warmte">
+              <input type="checkbox" id="sc-warmte" onchange="schouwSync();toggleMedia('warmte')" style="width:16px;height:16px;accent-color:#002147;cursor:pointer">
+              <span>Warmte / koude</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg)" id="lbl-water">
+              <input type="checkbox" id="sc-water" onchange="schouwSync();toggleMedia('water')" style="width:16px;height:16px;accent-color:#002147;cursor:pointer">
+              <span>Water</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg)" id="lbl-stoom">
+              <input type="checkbox" id="sc-stoom" onchange="schouwSync()" style="width:16px;height:16px;accent-color:#002147;cursor:pointer">
+              <span>Stoom / perslucht</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg)" id="lbl-pv">
+              <input type="checkbox" id="sc-pv" onchange="schouwSync()" style="width:16px;height:16px;accent-color:#002147;cursor:pointer">
+              <span>Zonnepanelen (teruglevering)</span>
+            </label>
+          </div>
+
+          <!-- Elektra detail -->
+          <div id="detail-elektra" style="display:none;background:#F0F8FF;border-radius:var(--radius-sm);padding:.9rem 1rem;border-left:3px solid #00AEEF;margin-bottom:.75rem">
+            <div style="font-size:11px;font-weight:600;color:#1B4F84;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Elektra — details</div>
+            <div class="grid2">
+              <div class="field"><label>Aansluitwaarde hoofdmeter</label>
+                <select id="sc-e-aansluiting" onchange="schouwSync()">
+                  <option value="">— Kies —</option>
+                  <option>1×25A (kleinverbruik)</option><option>3×25A</option><option>3×63A</option>
+                  <option>3×80A</option><option>3×160A</option><option>MSA / grootverbruik</option>
+                </select>
+              </div>
+              <div class="field"><label>Fases</label>
+                <select id="sc-e-fases" onchange="schouwSync()">
+                  <option value="">— Kies —</option>
+                  <option>1-fase (230V)</option><option>3-fase (400V)</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Jaarverbruik elektra (kWh)</label>
+                <input id="sc-e-verbruik" type="number" placeholder="bijv. 150000" oninput="schouwSync()">
+              </div>
+              <div class="field"><label>DIN-rail ruimte beschikbaar?</label>
+                <select id="sc-e-dinrail" onchange="schouwSync()">
+                  <option value="">— Kies —</option>
+                  <option>Ja, voldoende ruimte</option><option>Ja, beperkt</option><option>Nee — uitbreiding nodig</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label>Locatie groepenkast / hoofdverdeler</label>
+              <input id="sc-e-locatie" placeholder="bijv. meterkast begane grond, centrale hal" oninput="schouwSync()">
+            </div>
+          </div>
+
+          <!-- Gas detail -->
+          <div id="detail-gas" style="display:none;background:#FFF8EC;border-radius:var(--radius-sm);padding:.9rem 1rem;border-left:3px solid #BA7517;margin-bottom:.75rem">
+            <div style="font-size:11px;font-weight:600;color:#7A4F00;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Gas — details</div>
+            <div class="grid2">
+              <div class="field"><label>Metertype / G-waarde</label>
+                <select id="sc-g-type" onchange="schouwSync()">
+                  <option value="">— Kies —</option>
+                  <option>G4 (woning)</option><option>G6</option><option>G10</option><option>G16</option>
+                  <option>G25</option><option>G40</option><option>G65 en groter</option>
+                </select>
+              </div>
+              <div class="field"><label>Jaarverbruik gas (m³)</label>
+                <input id="sc-g-verbruik" type="number" placeholder="bijv. 50000" oninput="schouwSync()">
+              </div>
+            </div>
+            <div class="field"><label>EVHI aanwezig? (volume-herleidingsinstrument)</label>
+              <select id="sc-g-evhi" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Ja</option><option>Nee</option><option>Onbekend</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Warmte detail -->
+          <div id="detail-warmte" style="display:none;background:#F0FFF4;border-radius:var(--radius-sm);padding:.9rem 1rem;border-left:3px solid #0F6E56;margin-bottom:.75rem">
+            <div style="font-size:11px;font-weight:600;color:#085041;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Warmte / koude — details</div>
+            <div class="grid2">
+              <div class="field"><label>Type warmtebron</label>
+                <select id="sc-w-bron" onchange="schouwSync()">
+                  <option value="">— Kies —</option>
+                  <option>Stadsverwarming / warmtenet</option><option>Centrale CV-installatie (blokverwaming)</option>
+                  <option>WKO / warmtepomp</option><option>Individuele CV per unit</option><option>Anders</option>
+                </select>
+              </div>
+              <div class="field"><label>Leidingdiameter (DN)</label>
+                <select id="sc-w-dn" onchange="schouwSync()">
+                  <option value="">— Kies —</option>
+                  <option>DN15</option><option>DN20</option><option>DN25</option><option>DN32</option>
+                  <option>DN40</option><option>DN50</option><option>DN65 en groter</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Vloeistoftype</label>
+                <select id="sc-w-vloeistof" onchange="schouwSync()">
+                  <option value="">— Kies —</option>
+                  <option>Water</option><option>Glycolmengsel</option><option>Onbekend</option>
+                </select>
+              </div>
+              <div class="field"><label>Rechte in-/uitlooplengte beschikbaar?</label>
+                <select id="sc-w-inloop" onchange="schouwSync()">
+                  <option value="">— Kies —</option>
+                  <option>Ja (&gt;5× DN voor en &gt;3× DN na)</option>
+                  <option>Beperkt — navragen</option><option>Nee — aanpassing nodig</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label>Afsluiter voor en na meetpunt aanwezig?</label>
+              <select id="sc-w-afsluiter" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Ja</option><option>Nee — moet worden geplaatst</option><option>Gedeeltelijk</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Water detail -->
+          <div id="detail-water" style="display:none;background:#F5F0FF;border-radius:var(--radius-sm);padding:.9rem 1rem;border-left:3px solid #534AB7;margin-bottom:.75rem">
+            <div style="font-size:11px;font-weight:600;color:#3C3489;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Water — details</div>
+            <div class="grid2">
+              <div class="field"><label>Type (koud / warm / circulatie)</label>
+                <select id="sc-wat-type" onchange="schouwSync()">
+                  <option value="">— Kies —</option>
+                  <option>Koud water</option><option>Warm tapwater</option><option>Circulatieleiding</option><option>Meerdere</option>
+                </select>
+              </div>
+              <div class="field"><label>Jaarverbruik water (m³)</label>
+                <input id="sc-wat-verbruik" type="number" placeholder="bijv. 5000" oninput="schouwSync()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Bestaande meters -->
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>3 — Bestaande meterinfrastructuur</h2></div>
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Zijn er al (sub)meters aanwezig?</label>
+              <select id="sc-bestaand" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Nee — volledig nieuw</option>
+                <option>Ja, gedeeltelijk</option>
+                <option>Ja, volledig maar verouderd</option>
+                <option>Ja, volledig en functioneel</option>
+              </select>
+            </div>
+            <div class="field"><label>MID-gekeurd?</label>
+              <select id="sc-mid" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Ja, geldig</option>
+                <option>Ja, maar verlopen</option>
+                <option>Nee</option>
+                <option>Onbekend</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Merk / type bestaande meters</label>
+              <input id="sc-merk" placeholder="bijv. ABB B23, Kamstrup 303..." oninput="schouwSync()">
+            </div>
+            <div class="field"><label>Bouwjaar meters (ca.)</label>
+              <input id="sc-meter-jaar" placeholder="bijv. 2015" oninput="schouwSync()">
+            </div>
+          </div>
+          <div class="field"><label>Bestaande communicatieprotocollen</label>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px">
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-proto-mbus" onchange="schouwSync()" style="accent-color:#002147"> M-Bus</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-proto-modbus" onchange="schouwSync()" style="accent-color:#002147"> Modbus RS485</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-proto-wmbus" onchange="schouwSync()" style="accent-color:#002147"> WM-Bus (draadloos)</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-proto-puls" onchange="schouwSync()" style="accent-color:#002147"> Pulsuitgang</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-proto-lora" onchange="schouwSync()" style="accent-color:#002147"> LoRa / 4G</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-proto-geen" onchange="schouwSync()" style="accent-color:#002147"> Geen / onbekend</label>
+            </div>
+          </div>
+          <div class="field"><label>Wordt data nu al uitgelezen?</label>
+            <select id="sc-uitlezing" onchange="schouwSync()">
+              <option value="">— Kies —</option>
+              <option>Nee — handmatig opnemen</option>
+              <option>Ja — handmatig in systeem invoeren</option>
+              <option>Ja — automatisch via datalogger</option>
+              <option>Ja — gekoppeld aan EMS / GBS</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RECHTER KOLOM -->
+    <div>
+
+      <!-- 4. Meetpuntinventarisatie -->
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>4 — Meetpuntinventarisatie</h2></div>
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Gewenste meetpunten elektra</label>
+              <input id="sc-mp-elektra" type="number" placeholder="0" oninput="schouwSync();updateMPTotal()">
+            </div>
+            <div class="field"><label>Gewenste meetpunten gas</label>
+              <input id="sc-mp-gas" type="number" placeholder="0" oninput="schouwSync();updateMPTotal()">
+            </div>
+            <div class="field"><label>Gewenste meetpunten warmte/koude</label>
+              <input id="sc-mp-warmte" type="number" placeholder="0" oninput="schouwSync();updateMPTotal()">
+            </div>
+            <div class="field"><label>Gewenste meetpunten water</label>
+              <input id="sc-mp-water" type="number" placeholder="0" oninput="schouwSync();updateMPTotal()">
+            </div>
+          </div>
+          <div style="background:#002147;border-radius:var(--radius-sm);padding:.75rem 1rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <span style="font-size:13px;color:rgba(255,255,255,.7)">Totaal meetpunten</span>
+            <span style="font-size:22px;font-weight:600;color:#00AEEF;font-family:'DM Mono',monospace" id="sc-mp-total">0</span>
+          </div>
+          <div class="field"><label>Meetpunten fysiek bereikbaar?</label>
+            <select id="sc-bereikbaar" onchange="schouwSync()">
+              <option value="">— Kies —</option>
+              <option>Ja, alle</option>
+              <option>Merendeel ja, enkele moeilijk</option>
+              <option>Nee — steiger / lift nodig</option>
+            </select>
+          </div>
+          <div class="field"><label>Bijzonderheden meetpuntlocaties</label>
+            <textarea id="sc-mp-opmerking" placeholder="Ex-zone, buiten, vochtig, besloten ruimte, hoogte..." oninput="schouwSync()" style="min-height:56px"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Datacommunicatie -->
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>5 — Datacommunicatie</h2></div>
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Gewenst communicatieprotocol</label>
+              <select id="sc-comm-gewenst" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>M-Bus (bekabeld)</option>
+                <option>WM-Bus (draadloos)</option>
+                <option>Modbus RS485</option>
+                <option>LoRa</option>
+                <option>4G / LTE</option>
+                <option>Ethernet / TCP-IP</option>
+                <option>Te bepalen na schouw</option>
+              </select>
+            </div>
+            <div class="field"><label>Ethernet / netwerk aanwezig op locatie?</label>
+              <select id="sc-netwerk" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Ja — vaste verbinding beschikbaar</option>
+                <option>Ja — wifi beschikbaar</option>
+                <option>Nee — 4G nodig</option>
+                <option>Onbekend</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Datalogger / gateway al aanwezig?</label>
+              <select id="sc-gateway" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Ja — type: <span id="sc-gw-type"></span></option>
+                <option value="ja-type">Ja — zie notitie</option>
+                <option>Nee — nieuw te plaatsen</option>
+              </select>
+            </div>
+            <div class="field"><label>Koppeling met EMS / GBS gewenst?</label>
+              <select id="sc-ems" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Ja — bestaand systeem</option>
+                <option>Ja — nieuw dashboard Imbema</option>
+                <option>Nee — alleen uitlezen</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Type EMS / GBS (indien aanwezig)</label>
+            <input id="sc-ems-type" placeholder="bijv. Siemens Desigo, Honeywell, eigen systeem..." oninput="schouwSync()">
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Installatie-randvoorwaarden -->
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>6 — Installatie-randvoorwaarden</h2></div>
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Eigenaar installatie</label>
+              <select id="sc-eigenaar" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Verhuurder / eigenaar pand</option>
+                <option>Huurder / gebruiker</option>
+                <option>VvE</option>
+                <option>Woningcorporatie</option>
+                <option>Gemeente / overheid</option>
+              </select>
+            </div>
+            <div class="field"><label>Installatiemoment</label>
+              <select id="sc-moment" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Vrij inplanbaar</option>
+                <option>Alleen buiten kantooruren</option>
+                <option>Alleen weekenden</option>
+                <option>Tijdens geplande onderhoudsbeurt</option>
+                <option>Tijdens renovatie / nieuwbouw</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Onderhoudspartij actief?</label>
+              <select id="sc-onderhoud" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Ja — naam in notitie</option>
+                <option>Nee</option>
+                <option>Onbekend</option>
+              </select>
+            </div>
+            <div class="field"><label>Toegang / sleutels nodig?</label>
+              <select id="sc-toegang" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option>Nee — vrij toegankelijk</option>
+                <option>Ja — via facility/receptie</option>
+                <option>Ja — speciale sleutel / pas</option>
+                <option>Ja — BHV-begeleiding vereist</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Bijzondere veiligheidsvoorschriften</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-vvb-exzone" onchange="schouwSync()" style="accent-color:#002147"> Ex-zone (explosiegevaar)</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-vvb-vochtig" onchange="schouwSync()" style="accent-color:#002147"> Vochtige / natte omgeving</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-vvb-buiten" onchange="schouwSync()" style="accent-color:#002147"> Buitenopstelling</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="sc-vvb-borg" onchange="schouwSync()" style="accent-color:#002147"> Borgstroom / UPS vereist</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Schouwconclusie + doorsturen -->
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>7 — Conclusie &amp; vervolgstap</h2></div>
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Complexiteit installatie</label>
+              <select id="sc-complexiteit" onchange="schouwSync()">
+                <option value="">— Kies —</option>
+                <option value="laag">Laag — standaard plaatsing</option>
+                <option value="midden">Midden — enige aanpassingen</option>
+                <option value="hoog">Hoog — maatwerk vereist</option>
+              </select>
+            </div>
+            <div class="field"><label>Geschatte installatieduur (dagen)</label>
+              <input id="sc-duur" type="number" placeholder="bijv. 2" oninput="schouwSync()">
+            </div>
+          </div>
+          <div class="field"><label>Schouwnotitie / aanbeveling</label>
+            <textarea id="sc-conclusie" placeholder="Wat valt op, wat is de aanbeveling, welke meters specifiek nodig..." oninput="schouwSync()" style="min-height:80px"></textarea>
+          </div>
+          <div class="field"><label>Uitgevoerd door</label>
+            <input id="sc-uitvoerder" placeholder="Naam meetspecialist" oninput="schouwSync()">
+          </div>
+          <div class="field"><label>Datum schouw</label>
+            <input id="sc-datum" type="date" oninput="schouwSync()">
+          </div>
+
+          <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:.5rem">
+            <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem">Schouwdata doorsturen naar</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px">
+              <span style="color:#00AEEF;font-size:16px">&#8594;</span>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--text)">ROI-calculator</div>
+                <div style="font-size:11px;color:var(--muted)">Aantal meetpunten + verbruik worden overgenomen</div>
+              </div>
+              <button class="btn accent sm" onclick="schouwNaarROI()">Open ROI &#8594;</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm)">
+              <span style="color:#3B6D11;font-size:16px">&#8594;</span>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--text)">ERP-order</div>
+                <div style="font-size:11px;color:var(--muted)">Schouwgegevens zichtbaar in projectdossier</div>
+              </div>
+              <button class="btn sm" onclick="schouwNaarERP()">Open ERP &#8594;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ERP ══════════════ -->
+<div id="page-erp" class="page">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+    <div>
+      <div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:2px">ERP-order — Lead2Cash</div>
+      <div style="font-size:13px;color:var(--muted)">Klantdata en ROI-resultaat overgenomen</div>
+    </div>
+    <button class="btn primary" onclick="saveERP()">ERP opslaan</button>
+  </div>
+
+  <div class="grid2" style="align-items:start">
+    <div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Ordergegevens <span style="font-size:10px;color:var(--bl);font-weight:400;text-transform:none;letter-spacing:0">(overgenomen)</span></h2></div>
+        <div class="panel-body">
+          <div class="data-row"><span class="lbl">Klant</span><span class="val" id="e-company">—</span></div>
+          <div class="data-row"><span class="lbl">Contactpersoon</span><span class="val" id="e-contact">—</span></div>
+          <div class="data-row"><span class="lbl">Sector</span><span class="val" id="e-sector">—</span></div>
+          <div class="data-row"><span class="lbl">Meetpunten</span><span class="val" id="e-meetpunten">—</span></div>
+          <div class="data-row"><span class="lbl">Energiedrager</span><span class="val" id="e-media">—</span></div>
+          <div class="data-row"><span class="lbl">ROI terugverdientijd</span><span class="val" id="e-payback" style="color:var(--bl);font-weight:600">—</span></div>
+          <div class="data-row"><span class="lbl">Ordernummer</span><span class="val" id="e-ordernr" style="font-family:'DM Mono',monospace">—</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-dot"></div><h2>Projectplanning</h2></div>
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Startdatum installatie</label><input id="e-start" type="date" oninput="saveERP()"></div>
+            <div class="field"><label>Verwachte oplevering</label><input id="e-end" type="date" oninput="saveERP()"></div>
+          </div>
+          <div class="field"><label>Projectleider</label>
+            <select id="e-pm" onchange="saveERP()">
+              <option value="">— Kies projectleider —</option>
+              <option value="Nick van den Oudenrijn">Nick van den Oudenrijn</option>
+              <option value="Kevin Boshoven">Kevin Boshoven</option>
+              <option value="Paul-Jan">Paul-Jan</option>
+              <option value="Meetspecialist">Meetspecialist</option>
+            </select>
+          </div>
+          <div class="field"><label>Installatie-notitie</label><textarea id="e-note" placeholder="Toegang, bijzonderheden, contactafspraken..." oninput="saveERP()"></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+        <div class="section-lbl" style="margin-bottom:0">Takenlijst — Lead2Cash</div>
+        <span style="font-size:12px;color:var(--muted)" id="e-progress">0 / 8 voltooid</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="e-progbar" style="width:0%"></div></div>
+
+      <div id="e-tasks">
+        <div class="erp-task" id="et0"><input type="checkbox" onchange="tickTask(0)"><span class="t-text">Schouw locatie uitgevoerd &amp; gedocumenteerd</span><span class="t-owner">Meetspecialist</span></div>
+        <div class="erp-task" id="et1"><input type="checkbox" onchange="tickTask(1)"><span class="t-text">Offerte opgesteld en verzonden</span><span class="t-owner">Sales</span></div>
+        <div class="erp-task" id="et2"><input type="checkbox" onchange="tickTask(2)"><span class="t-text">Orderbevestiging ontvangen / getekend</span><span class="t-owner">Sales</span></div>
+        <div class="erp-task" id="et3"><input type="checkbox" onchange="tickTask(3)"><span class="t-text">Materiaal besteld bij inkoop</span><span class="t-owner">Lisa Zwaans</span></div>
+        <div class="erp-task" id="et4"><input type="checkbox" onchange="tickTask(4)"><span class="t-text">Levering materiaal bevestigd</span><span class="t-owner">Logistiek</span></div>
+        <div class="erp-task" id="et5"><input type="checkbox" onchange="tickTask(5)"><span class="t-text">Installatie afgerond</span><span class="t-owner">Meetspecialist</span></div>
+        <div class="erp-task" id="et6"><input type="checkbox" onchange="tickTask(6)"><span class="t-text">Inbedrijfstelling &amp; datastest geslaagd</span><span class="t-owner">IT / EMS</span></div>
+        <div class="erp-task" id="et7"><input type="checkbox" onchange="tickTask(7)"><span class="t-text">Oplevering getekend — klant akkoord</span><span class="t-owner">Projectleider</span></div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-lbl">Factuurstatus</div>
+      <div class="panel" style="margin-bottom:0">
+        <div class="panel-body">
+          <div class="grid2">
+            <div class="field"><label>Factuur voorschot</label>
+              <select id="e-fac1" onchange="saveERP()">
+                <option value="">— niet verzonden —</option>
+                <option value="verzonden">Verzonden</option>
+                <option value="betaald">Betaald</option>
+              </select>
+            </div>
+            <div class="field"><label>Factuur eindafrekening</label>
+              <select id="e-fac2" onchange="saveERP()">
+                <option value="">— niet verzonden —</option>
+                <option value="verzonden">Verzonden</option>
+                <option value="betaald">Betaald</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ RAPPORTAGES ══════════════ -->
+<div id="page-rapport" class="page">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+    <div>
+      <div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:2px">Rapportages</div>
+      <div style="font-size:13px;color:var(--muted)">Overzicht vanuit CRM, Pipeline, ROI en ERP</div>
+    </div>
+    <div class="btn-row">
+      <select id="rp-periode" onchange="buildRapport()" style="height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;padding:0 10px 0 10px;cursor:pointer">
+        <option value="all">Alle tijd</option>
+        <option value="month">Deze maand</option>
+        <option value="quarter">Dit kwartaal</option>
+      </select>
+      <button class="btn" onclick="window.print()">Afdrukken</button>
+    </div>
+  </div>
+
+  <div class="grid4" style="margin-bottom:1.5rem" id="rp-kpis"></div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <div class="chart-wrap">
+      <div class="chart-title">Pipeline per fase</div>
+      <div id="rp-pipeline-bars"></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Leads per sector</div>
+      <div id="rp-sector-bars"></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <div class="chart-wrap">
+      <div class="chart-title">Orderwaarde per fase (€)</div>
+      <div id="rp-value-bars"></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Leads per bron</div>
+      <div id="rp-bron-bars"></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:1.5rem">
+    <div class="chart-wrap">
+      <div class="chart-title">ROI-resultaten — terugverdientijd per lead</div>
+      <div id="rp-roi-bars"></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">ERP — Lead2Cash voortgang per order</div>
+      <div id="rp-erp-bars"></div>
+    </div>
+  </div>
+
+  <div class="chart-wrap" style="margin-bottom:1.5rem">
+    <div class="chart-title">Alle leads — volledig overzicht</div>
+    <table style="width:100%;border-collapse:collapse" id="rp-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg)">Bedrijf</th>
+          <th style="text-align:left;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg)">Sector</th>
+          <th style="text-align:left;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg)">Status</th>
+          <th style="text-align:right;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg)">Orderwaarde</th>
+          <th style="text-align:right;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg)">Meetpunten</th>
+          <th style="text-align:right;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg)">MWh/jr</th>
+          <th style="text-align:center;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg)">ROI</th>
+          <th style="text-align:center;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg)">ERP taken</th>
+        </tr>
+      </thead>
+      <tbody id="rp-tbody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ══════════════ SUPPORT ══════════════ -->
+<div id="page-support" class="page">
+  <div style="max-width:860px">
+    <div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:.4rem">Support &amp; uitleg</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:2rem">Hoe werkt de tool, wat doe je wanneer, en hoe zit het proces in elkaar.</div>
+
+    <div class="panel" style="margin-bottom:1.5rem">
+      <div class="panel-hdr"><div class="panel-dot"></div><h2>Wat is dit voor tool?</h2></div>
+      <div class="panel-body">
+        <p style="font-size:13px;line-height:1.7;color:var(--text);margin-bottom:.75rem">Dit is de Imbema CRM &amp; Sales Tool — een geïntegreerd systeem voor het beheren van leads, het berekenen van ROI, en het begeleiden van een project van lead tot oplevering. Het grote voordeel: je vult klantdata <strong>één keer in</strong> en die stroomt automatisch door naar de ROI-calculator en de ERP-module. Geen dubbele invoer.</p>
+        <p style="font-size:13px;line-height:1.7;color:var(--text)">De tool slaat alles lokaal op in je browser (localStorage) — je kunt het venster sluiten en alles staat er nog. Sla het HTML-bestand op een gedeelde schijf voor teamegebruik.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:1.5rem">
+      <div class="panel-hdr"><div class="panel-dot"></div><h2>Het verkoopproces stap voor stap</h2></div>
+      <div class="panel-body">
+        <div style="display:flex;flex-direction:column;gap:0">
+          <div style="display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)">
+            <div style="width:32px;height:32px;border-radius:50%;background:#002147;color:#00AEEF;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">1</div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Lead aanmaken — tab "Lead / offerte"</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">Vul bedrijfsnaam, contactpersoon, sector, aantal meetpunten en het jaarlijks verbruik in. Dit zijn de basisgegevens die doorstromen naar ROI en ERP. Sla op met de knop "Opslaan" — het lead-kaartje verschijnt in de pipeline.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)">
+            <div style="width:32px;height:32px;border-radius:50%;background:#1B4F84;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">2</div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Kwalificeren — pipeline verslepen</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">Sleep het kaartje van "Nieuw" naar "Gekwalificeerd" zodra je de behoefte hebt bevestigd. Dit betekent: klant herkent het pijnpunt, er is budget of bereidheid, en een schouw is zinvol. Noteer de volgende actie met datum.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)">
+            <div style="width:32px;height:32px;border-radius:50%;background:#BA7517;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">3</div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Schouw uitvoeren + ROI berekenen — naar "Schouw / ROI gereed"</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">Voer de schouw uit en vul het aantal meetpunten en het werkelijke verbruik in bij de lead. Open daarna de ROI-calculator — kies kWh of MWh (staat op de factuur van de klant), pas de energieprijs aan naar de werkelijke prijs. Sla het resultaat op. De terugverdientijd wordt opgeslagen in het dossier.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)">
+            <div style="width:32px;height:32px;border-radius:50%;background:#185FA5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">4</div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Voorstel sturen — naar "Voorstel uitgebracht"</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">Stuur de offerte op basis van de ROI-berekening. Sleep het kaartje naar "Voorstel uitgebracht". Sla de ROI op als HTML voor de klant via de knop "Opslaan als HTML" in de ROI-tab.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)">
+            <div style="width:32px;height:32px;border-radius:50%;background:#0A6640;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">5</div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Deal sluiten — naar "Gesloten"</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">Zodra de klant akkoord geeft, sleep je het kaartje naar "Gesloten". Vul de definitieve orderwaarde in zodat de rapportages kloppen. Verloren deals zet je op "Verloren" — ze blijven zichtbaar in de rapportages voor conversiemeting.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)">
+            <div style="width:32px;height:32px;border-radius:50%;background:#3B6D11;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">6</div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Uitvoering — tab "ERP order"</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">Na het sluiten van de deal open je de ERP-tab. Alle klantdata en ROI-terugverdientijd zijn al aanwezig. Vul start- en einddatum in, wijs een projectleider toe. Vink de 8 Lead2Cash-stappen af: schouw → offerte → orderbevestiging → inkoop → levering → installatie → inbedrijfstelling → oplevering.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem;padding:1rem 0">
+            <div style="width:32px;height:32px;border-radius:50%;background:#00AEEF;color:#002147;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">7</div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Rapportages — tab "Rapportages"</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">Bekijk in één oogopslag de volledige pipeline, conversieratio, pijplijnwaarde per fase, ROI-terugverdientijden en ERP-voortgang. Klik op "Afdrukken" voor een PDF-export.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:1.5rem">
+      <div class="panel-hdr"><div class="panel-dot"></div><h2>ROI-calculator — uitleg velden</h2></div>
+      <div class="panel-body" style="padding:0;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr>
+            <th style="background:#002147;color:#fff;padding:8px 12px;text-align:left;font-weight:500;font-size:11px;width:22%">Veld</th>
+            <th style="background:#002147;color:#fff;padding:8px 12px;text-align:left;font-weight:500;font-size:11px;width:45%">Uitleg</th>
+            <th style="background:#002147;color:#fff;padding:8px 12px;text-align:left;font-weight:500;font-size:11px">Tip</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 12px;font-weight:500">Eenheid kWh / MWh</td><td style="padding:9px 12px;color:var(--muted)">Kies de eenheid die op de energiefactuur van de klant staat. Sliders en prijzen passen automatisch aan — geen omrekenen nodig.</td><td style="padding:9px 12px;color:var(--muted)">Kleinere klanten (VvE, zorg, recreatie) → kWh. Industrie en logistiek → MWh.</td></tr>
+            <tr style="border-bottom:1px solid var(--border);background:var(--bg)"><td style="padding:9px 12px;font-weight:500">Jaarlijks energieverbruik</td><td style="padding:9px 12px;color:var(--muted)">Het totaal verbruik per jaar van de klant. Staat op de jaarafrekening of is op te vragen bij de energieleverancier.</td><td style="padding:9px 12px;color:var(--muted)">Klein kantoor: ±50.000–200.000 kWh. Fabriek: 1M–50M kWh.</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 12px;font-weight:500">Energieprijs</td><td style="padding:9px 12px;color:var(--muted)">Alles-in prijs inclusief netkosten en belastingen. Instelbaar tot €3,00/kWh voor periodes met hoge marktprijzen.</td><td style="padding:9px 12px;color:var(--muted)">Normaal NL groot: €0,11–0,15/kWh. Vraag naar de jaarfactuur.</td></tr>
+            <tr style="border-bottom:1px solid var(--border);background:var(--bg)"><td style="padding:9px 12px;font-weight:500">Besparing door inzicht</td><td style="padding:9px 12px;color:var(--muted)">Verwacht percentage energiebesparing dankzij tussenbemetering. Verdeeld over: stand-by/nacht (40%), lekverliezen (35%), piekbelasting (25%).</td><td style="padding:9px 12px;color:var(--muted)">Praktijkcases tonen 8–15%. Gebruik 8% bij voorzichtige schattingen.</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 12px;font-weight:500">Installatiekosten</td><td style="padding:9px 12px;color:var(--muted)">Eenmalige kosten voor hardware, engineering, installatie en inbedrijfstelling. Afhankelijk van aantal meetpunten en complexiteit.</td><td style="padding:9px 12px;color:var(--muted)">Vuistregel: €600–1.200 per meetpunt all-in.</td></tr>
+            <tr style="border-bottom:1px solid var(--border);background:var(--bg)"><td style="padding:9px 12px;font-weight:500">SLA / licentie</td><td style="padding:9px 12px;color:var(--muted)">Maandelijkse kosten voor dashboard, monitoring, support en updates. Kies het pakket dat past bij de klantbehoefte.</td><td style="padding:9px 12px;color:var(--muted)">Inzicht (€299) voor eenvoudig inzicht. Controle (€599) voor actief beheer. Partner voor grote projecten.</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 12px;font-weight:500">Netcongestie-risico</td><td style="padding:9px 12px;color:var(--muted)">Financiële waarde van het vermijden van netcongestie-problemen: boetes bij overschrijding transportcontract, kosten bij productiestop.</td><td style="padding:9px 12px;color:var(--muted)">Relevant voor industrie en logistiek met zware aansluitingen.</td></tr>
+            <tr style="background:var(--bg)"><td style="padding:9px 12px;font-weight:500">CSRD/EED compliance</td><td style="padding:9px 12px;color:var(--muted)">Waarde van verplichte energierapportage: besparing op externe auditkosten, vermijden boetes (tot €100K bij niet-naleving EED).</td><td style="padding:9px 12px;color:var(--muted)">Zorgorganisaties en grote vastgoedpartijen: hoog. Recreatie en MKB: laag tot nul.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:1.5rem">
+      <div class="panel-hdr"><div class="panel-dot"></div><h2>Veelgestelde vragen</h2></div>
+      <div class="panel-body">
+        <div style="border-bottom:1px solid var(--border);padding-bottom:.75rem;margin-bottom:.75rem">
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Hoe sla ik de tool op voor het hele team?</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Sla het HTML-bestand op een gedeelde netwerkschijf of SharePoint op. Elk teamlid opent het vanuit de browser — data wordt dan lokaal opgeslagen per gebruiker. Voor gedeelde data is een webserver nodig (GitHub Pages, Netlify).</div>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:.75rem;margin-bottom:.75rem">
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Hoe exporteer ik een ROI-berekening voor een klant?</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Open de ROI-tab, vul alles in voor die klant, klik op "Opslaan als HTML". Je krijgt een kant-en-klaar HTML-bestand op naam van de klant dat je kunt e-mailen of printen als PDF (Ctrl+P → Opslaan als PDF).</div>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:.75rem;margin-bottom:.75rem">
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Wat als ik per ongeluk een lead verwijder?</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Er is geen undo. Maak regelmatig een back-up door het HTML-bestand op te slaan (Ctrl+S in de browser, of "Opslaan als HTML" in de ROI-tab). De back-up bevat alle data die op dat moment in de browser staat.</div>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:.75rem;margin-bottom:.75rem">
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">Verschil kWh en MWh — wanneer gebruik ik welke?</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">1 MWh = 1.000 kWh. Kleinverbruikers (VvE's, zorg, horeca, recreatie) rekenen in kWh — dit staat ook op hun factuur. Grootverbruikers (industrie, logistiek, data centers) rekenen in MWh. Kies de eenheid die op de factuur van de klant staat — de calculator rekent automatisch om.</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px">De externe ROI-calculator (los bestand) vs. deze ingebouwde versie</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">De ingebouwde ROI-calculator heeft exact dezelfde functionaliteit als het losse bestand (imbema_roi_calculator.html), inclusief kWh/MWh toggle, scenario-analyse, benchmark en maandelijks overzicht. Het verschil: de ingebouwde versie haalt klantdata automatisch op uit het CRM-dossier. Beide kunnen als PDF worden opgeslagen voor de klant.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-dot"></div><h2>Contactgegevens &amp; versie</h2></div>
+      <div class="panel-body">
+        <div class="data-row"><span class="lbl">Tool versie</span><span class="val">Imbema CRM &amp; Sales Tool v2.0</span></div>
+        <div class="data-row"><span class="lbl">Gebouwd voor</span><span class="val">Imbema Asset Solutions — intern gebruik</span></div>
+        <div class="data-row"><span class="lbl">Vragen / aanpassingen</span><span class="val">Neem contact op met je manager of IT</span></div>
+        <div class="data-row"><span class="lbl">Data opslag</span><span class="val">Lokaal in browser (localStorage) — geen server</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'imbema_crm_v1';
+const SECTOR_LABELS = {zorg:'Zorg & Onderwijs',vastgoed:'Vastgoed',recreatie:'Recreatiepark',industrie:'Industrie',logistiek:'Logistiek'};
+const MEDIA_LABELS = {elektra:'Elektra',gas:'Gas',warmte:'Warmte',water:'Water',multi:'Multi-media'};
+const STATUS_ORDER = ['nieuw','gekwalificeerd','schouw','voorstel','gesloten-won','verloren'];
+const SECTOR_DEF = {
+  zorg:      {price:108,saving:9, install:18000,monthly:399,grid:0,    comp:8000, kwh:0.108, mwh:600,  bVerbruik:600,  bBesparing:9,  bPayback:20},
+  vastgoed:  {price:110,saving:8, install:22000,monthly:499,grid:5000, comp:5000, kwh:0.110, mwh:800,  bVerbruik:800,  bBesparing:8,  bPayback:22},
+  recreatie: {price:115,saving:15,install:30000,monthly:599,grid:0,    comp:3000, kwh:0.115, mwh:1200, bVerbruik:1200, bBesparing:14, bPayback:16},
+  industrie: {price:130,saving:12,install:40000,monthly:799,grid:15000,comp:8000, kwh:0.130, mwh:5000, bVerbruik:5000, bBesparing:12, bPayback:14},
+  logistiek: {price:120,saving:10,install:35000,monthly:699,grid:30000,comp:5000, kwh:0.120, mwh:3000, bVerbruik:3000, bBesparing:10, bPayback:18},
+};
+
+let db = {leads:[], nextId:1, roiResults:{}, erpData:{}};
+let currentId = null;
+let showTable = false;
+let roiPayback = '—';
+let roiNPV = '—';
+let taskState = {};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) db = JSON.parse(raw);
+    if(!db.roiResults)  db.roiResults  = {};
+    if(!db.erpData)     db.erpData     = {};
+    if(!db.schouwData)  db.schouwData  = {};
+  } catch(e) { db = {leads:[],nextId:1,roiResults:{},erpData:{},schouwData:{}}; }
+  if(db.leads.length===0) seedDemo();
+  renderPipeline();
+  updateKPIs();
+  checkSession();
+}
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch(e) {}
+}
+
+function seedDemo() {
+  const demos = [
+    {company:'DUWO',contact:'Mirjam van der Net',role:'Facilitair Manager',email:'',phone:'',sector:'vastgoed',locaties:8,meetpunten:33,mwh:1200,status:'nieuw',note:'Via Nancy Weema. 33.000 studentenwoningen. Roland Holstlaan renovatie start Q3 2025.',next:'Bel Mirjam voor intro gesprek',date:'',adres:'Delft',bron:'referral',media:'multi',orderwaarde:35000},
+    {company:'Sint Jacob',contact:'Nancy Weema',role:'Contactpersoon',email:'',phone:'',sector:'zorg',locaties:5,meetpunten:20,mwh:600,status:'nieuw',note:'Eduard van Bockel weg. Nancy doorverwijzing naar gebouwverantwoordelijke.',next:'Mail Nancy sturen',date:'',adres:'Amsterdam',bron:'referral',media:'warmte',orderwaarde:22000},
+    {company:'Recreatiepark De Bron',contact:'Jan Smeets',role:'Technisch Directeur',email:'',phone:'',sector:'recreatie',locaties:1,meetpunten:45,mwh:1200,status:'gekwalificeerd',note:'Behoefte bevestigd. 70% meters ondeugdelijk. Schouw volgende maand inplannen.',next:'Schouw inplannen',date:'',adres:'Utrecht',bron:'linkedin',media:'multi',orderwaarde:30000},
+    {company:'Logicor Amsterdam',contact:'Petra van Dam',role:'Facility Manager',email:'',phone:'',sector:'logistiek',locaties:1,meetpunten:25,mwh:3000,status:'schouw',note:'Schouw gedaan. ROI terugverdientijd 18 mnd. Voorstel bijna gereed.',next:'Offerte opstellen en versturen',date:'',adres:'Amsterdam',bron:'event',media:'elektra',orderwaarde:35000},
+    {company:'Chiquita Rotterdam',contact:'R. de Boer',role:'Energy Manager',email:'',phone:'',sector:'industrie',locaties:1,meetpunten:30,mwh:5000,status:'voorstel',note:'Voorstel verstuurd. Klant bestudeert het.',next:'Follow-up call',date:'',adres:'Rotterdam',bron:'inbound',media:'elektra',orderwaarde:45000},
+    {company:'BASF Antwerpen',contact:'K. Peeters',role:'Operations Manager',email:'',phone:'',sector:'industrie',locaties:1,meetpunten:30,mwh:5000,status:'gesloten-won',note:'Deal gesloten. Installatie week 14.',next:'Overdracht aan projectleider',date:'',adres:'Antwerpen',bron:'outbound',media:'multi',orderwaarde:50000},
+  ];
+  demos.forEach(d => { db.leads.push({...d, id:db.nextId++}); });
+  save();
+}
+
+function getLead(id) { return db.leads.find(l=>l.id===id); }
+
+function renderPipeline() {
+  const cols = ['nieuw','gekwalificeerd','schouw','voorstel','gesloten-won'];
+  const colLabels = {'nieuw':'Nieuw','gekwalificeerd':'Gekwalificeerd','schouw':'Schouw / ROI gereed','voorstel':'Voorstel uitgebracht','gesloten-won':'Gesloten','verloren':'Verloren'};
+  const board = document.getElementById('pipeline-board');
+  board.innerHTML = '';
+
+  cols.forEach(status => {
+    const leads = db.leads.filter(l=>l.status===status);
+    const col = document.createElement('div');
+    col.className = 'pipe-col';
+    col.dataset.status = status;
+
+    col.innerHTML = `<div class="pipe-col-hdr">${colLabels[status]} <span class="nav-badge" style="background:var(--bg);color:var(--muted)">${leads.length}</span></div>`;
+
+    leads.forEach(l => {
+      const card = document.createElement('div');
+      card.className = 'pipe-card';
+      card.draggable = true;
+      card.dataset.id = l.id;
+      const fK = v=>v>=1000?'€'+(v/1000).toFixed(0)+'K':'€'+v;
+      card.innerHTML = `<div class="pc-name">${l.company}</div><div class="pc-meta">${SECTOR_LABELS[l.sector]||l.sector}${l.meetpunten?' · '+l.meetpunten+' mtr':''}</div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px"><span class="badge badge-${l.status}" style="font-size:9px">${colLabels[status]}</span><span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${l.orderwaarde?fK(+l.orderwaarde):''}</span></div>`;
+
+      card.addEventListener('click', () => openLead(l.id));
+
+      card.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', l.id);
+        card.classList.add('dragging');
+      });
+      card.addEventListener('dragend', () => card.classList.remove('dragging'));
+
+      col.appendChild(card);
+    });
+
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      const id = +e.dataTransfer.getData('text/plain');
+      const lead = getLead(id);
+      if(lead && lead.status !== status) {
+        lead.status = status;
+        save();
+        renderPipeline();
+        updateKPIs();
+        toast(`${lead.company} verplaatst naar "${colLabels[status]}"`);
+      }
+    });
+
+    board.appendChild(col);
+  });
+
+  const tbody = document.getElementById('lead-tbody');
+  if(tbody) {
+    tbody.innerHTML = '';
+    const colLabelsAll = {'nieuw':'Nieuw','gekwalificeerd':'Gekwalificeerd','schouw':'Schouw / ROI gereed','voorstel':'Voorstel uitgebracht','gesloten-won':'Gesloten','verloren':'Verloren'};
+    db.leads.forEach(l => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><strong>${l.company}</strong></td><td>${l.contact||'—'}</td><td>${SECTOR_LABELS[l.sector]||l.sector}</td><td>${l.meetpunten||'—'}</td><td><span class="badge badge-${l.status}">${colLabelsAll[l.status]||l.status}</span></td><td style="color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.next||'—'}</td><td><button class="btn sm" onclick="event.stopPropagation();openLead(${l.id})">Open</button></td>`;
+      tr.onclick = () => openLead(l.id);
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('badge-pipeline').textContent = db.leads.filter(l=>l.status!=='verloren').length;
+}
+
+function updateKPIs() {
+  const active = db.leads.filter(l=>l.status!=='verloren');
+  const orderVal = active.reduce((s,l)=>s+(+l.orderwaarde||0),0);
+  const orders = active.filter(l=>l.status==='gesloten-won').length;
+  const erps   = active.filter(l=>l.status==='voorstel').length;
+  document.getElementById('k-total').textContent = active.length;
+  document.getElementById('k-value').textContent = orderVal>=1000?'€ '+(orderVal/1000).toFixed(0)+'K':'€ '+orderVal;
+  document.getElementById('k-orders').textContent = orders;
+  document.getElementById('k-erp').textContent = erps;
+}
+
+function openLead(id) {
+  currentId = id;
+  const l = getLead(id);
+  if(!l) return;
+  document.getElementById('f-company').value    = l.company||'';
+  document.getElementById('f-contact').value    = l.contact||'';
+  document.getElementById('f-role').value       = l.role||'';
+  document.getElementById('f-email').value      = l.email||'';
+  document.getElementById('f-phone').value      = l.phone||'';
+  document.getElementById('f-adres').value      = l.adres||'';
+  document.getElementById('f-sector').value     = l.sector||'zorg';
+  document.getElementById('f-locaties').value   = l.locaties||'';
+  document.getElementById('f-meetpunten').value = l.meetpunten||'';
+  document.getElementById('f-mwh').value        = l.mwh||'';
+  document.getElementById('f-orderwaarde').value= l.orderwaarde||'';
+  document.getElementById('f-media').value      = l.media||'multi';
+  document.getElementById('f-status').value     = l.status||'nieuw';
+  document.getElementById('f-note').value       = l.note||'';
+  document.getElementById('f-next').value       = l.next||'';
+  document.getElementById('f-date').value       = l.date||'';
+  document.getElementById('f-bron').value       = l.bron||'';
+  document.getElementById('lead-page-title').textContent = l.company;
+  document.getElementById('btn-delete').style.display = 'inline-flex';
+
+  const erpD = db.erpData[id]||{};
+  taskState = erpD.tasks ? JSON.parse(JSON.stringify(erpD.tasks)) : {};
+  if(erpD.start) document.getElementById('e-start').value = erpD.start;
+  if(erpD.end)   document.getElementById('e-end').value   = erpD.end;
+  if(erpD.pm)    document.getElementById('e-pm').value    = erpD.pm;
+  if(erpD.note)  document.getElementById('e-note').value  = erpD.note;
+  if(erpD.fac1)  document.getElementById('e-fac1').value  = erpD.fac1;
+  if(erpD.fac2)  document.getElementById('e-fac2').value  = erpD.fac2;
+  for(let i=0;i<8;i++) {
+    const el = document.getElementById('et'+i);
+    const cb = el?.querySelector('input[type=checkbox]');
+    if(cb) cb.checked = !!taskState[i];
+    if(el) el.classList.toggle('done', !!taskState[i]);
+  }
+  updateTaskProgress();
+
+  const roiR = db.roiResults[id]||{};
+  roiPayback = roiR.payback||'—';
+  roiNPV     = roiR.npv||'—';
+
+  refreshROI();
+  refreshERP();
+  loadSchouwData(id);
+  showPage('lead', document.querySelectorAll('.nav-btn')[1]);
+}
+
+function newLead() {
+  currentId = null;
+  ['f-company','f-contact','f-role','f-email','f-phone','f-adres','f-locaties','f-meetpunten','f-mwh','f-orderwaarde','f-note','f-next','f-date'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('f-sector').value = 'zorg';
+  document.getElementById('f-status').value = 'nieuw';
+  document.getElementById('f-media').value  = 'multi';
+  document.getElementById('f-bron').value   = '';
+  document.getElementById('lead-page-title').textContent = 'Nieuwe lead';
+  document.getElementById('btn-delete').style.display = 'none';
+  taskState = {};
+  for(let i=0;i<8;i++){const el=document.getElementById('et'+i);if(el){el.classList.remove('done');const cb=el.querySelector('input');if(cb)cb.checked=false;}}
+  updateTaskProgress();
+  showPage('lead', document.querySelectorAll('.nav-btn')[1]);
+}
+
+function getFormLead() {
+  return {
+    id: currentId,
+    company:    document.getElementById('f-company').value.trim(),
+    contact:    document.getElementById('f-contact').value,
+    role:       document.getElementById('f-role').value,
+    email:      document.getElementById('f-email').value,
+    phone:      document.getElementById('f-phone').value,
+    adres:      document.getElementById('f-adres').value,
+    sector:     document.getElementById('f-sector').value,
+    locaties:   +document.getElementById('f-locaties').value||0,
+    meetpunten: +document.getElementById('f-meetpunten').value||0,
+    mwh:        +document.getElementById('f-mwh').value||0,
+    orderwaarde:+document.getElementById('f-orderwaarde').value||0,
+    media:      document.getElementById('f-media').value,
+    status:     document.getElementById('f-status').value,
+    note:       document.getElementById('f-note').value,
+    next:       document.getElementById('f-next').value,
+    date:       document.getElementById('f-date').value,
+    bron:       document.getElementById('f-bron').value,
+  };
+}
+
+function saveLead() {
+  const l = getFormLead();
+  if(!l.company) { toast('Vul een bedrijfsnaam in'); return; }
+  if(currentId) {
+    const idx = db.leads.findIndex(x=>x.id===currentId);
+    if(idx>-1) db.leads[idx] = {...l, id:currentId};
+  } else {
+    const id = db.nextId++;
+    currentId = id;
+    db.leads.push({...l, id});
+    document.getElementById('btn-delete').style.display='inline-flex';
+  }
+  save();
+  renderPipeline();
+  updateKPIs();
+  refreshROI();
+  refreshERP();
+  toast('Lead opgeslagen');
+}
+
+function deleteLead() {
+  if(!currentId || !confirm('Lead verwijderen?')) return;
+  db.leads = db.leads.filter(l=>l.id!==currentId);
+  delete db.roiResults[currentId];
+  delete db.erpData[currentId];
+  delete db.schouwData[currentId];
+  currentId = null;
+  save();
+  renderPipeline();
+  updateKPIs();
+  newLead();
+  toast('Lead verwijderd');
+}
+
+function liveSync() {
+  const l = getFormLead();
+  document.getElementById('lead-page-title').textContent = l.company||'Nieuwe lead';
+  if(currentId) {
+    const idx = db.leads.findIndex(x=>x.id===currentId);
+    if(idx>-1) db.leads[idx] = {...l, id:currentId};
+    save();
+    refreshROI();
+    refreshERP();
+  }
+}
+
+function goROI() { saveLead(); showPage('roi', document.querySelectorAll('.nav-btn')[3]); }
+function goERP() { saveLead(); showPage('erp', document.querySelectorAll('.nav-btn')[4]); }
+
+let roiUnit = 'kwh';
+
+function roiPosToVal(pos) {
+  pos = Math.round(pos);
+  if(roiUnit==='kwh') return pos<=100 ? pos*1000 : 100000+(pos-100)*10000;
+  else                return pos<=100 ? pos      : 100+(pos-100)*10;
+}
+function roiValToPos(val) {
+  if(roiUnit==='kwh') return val<=100000 ? Math.round(val/1000)     : Math.round(100+(val-100000)/10000);
+  else                return val<=100    ? Math.round(val)           : Math.round(100+(val-100)/10);
+}
+function roiGetMWh()     { return roiUnit==='kwh' ? roiPosToVal(+document.getElementById('roi-s-cons').value)/1000 : roiPosToVal(+document.getElementById('roi-s-cons').value); }
+function roiGetPriceMWh(){ const n=+document.getElementById('roi-s-price').value; return roiUnit==='kwh' ? (n/100)*1000 : n*10; }
+function roiGetPriceDisplay(){ const n=+document.getElementById('roi-s-price').value; return roiUnit==='kwh'?'€\u00a0'+(n/100).toFixed(2).replace('.',','):'€\u00a0'+(n*10).toLocaleString('nl-NL'); }
+
+function roiSetUnit(u) {
+  const curMWh = roiGetMWh();
+  const curPriceMWh = roiGetPriceMWh();
+  roiUnit = u;
+  const kwh = document.getElementById('roi-btn-kwh');
+  const mwh = document.getElementById('roi-btn-mwh');
+  if(kwh) { kwh.style.background = u==='kwh'?'#002147':'var(--bg)'; kwh.style.color = u==='kwh'?'#00AEEF':'var(--muted)'; }
+  if(mwh) { mwh.style.background = u==='mwh'?'#002147':'var(--bg)'; mwh.style.color = u==='mwh'?'#00AEEF':'var(--muted)'; }
+  const newConsVal = u==='kwh' ? curMWh*1000 : curMWh;
+  document.getElementById('roi-s-cons').value = roiValToPos(newConsVal);
+  document.getElementById('roi-cons-lbl').textContent = u==='kwh' ? 'Jaarlijks energieverbruik (kWh)' : 'Jaarlijks energieverbruik (MWh)';
+  if(u==='kwh') {
+    document.getElementById('roi-s-price').value = Math.min(300,Math.max(1,Math.round(curPriceMWh/1000*100)));
+    document.getElementById('roi-price-lbl').textContent = 'Energieprijs (€/kWh)';
+    document.getElementById('roi-h-price').textContent = 'Incl. netkosten & belastingen. Normaal ≈ €0,11–0,15/kWh · Piekprijzen tot €3,00/kWh';
+  } else {
+    document.getElementById('roi-s-price').value = Math.min(300,Math.max(1,Math.round(curPriceMWh/10)));
+    document.getElementById('roi-price-lbl').textContent = 'Energieprijs (€/MWh)';
+    document.getElementById('roi-h-price').textContent = 'Incl. netkosten & belastingen. Normaal ≈ €110–150/MWh · Piekprijzen tot €3.000/MWh';
+  }
+  calcROI();
+}
+
+function refreshROI() {
+  const l = currentId ? getLead(currentId) : null;
+  const g = id => document.getElementById(id);
+  g('r-company').textContent    = l?.company||'—';
+  g('r-contact').textContent    = l?.contact||'—';
+  g('r-sector').textContent     = SECTOR_LABELS[l?.sector]||l?.sector||'—';
+  g('r-meetpunten').textContent = l?.meetpunten ? l.meetpunten+' meetpunten' : '—';
+  g('r-mwh').textContent        = l?.mwh ? l.mwh+' MWh/jr' : '—';
+  g('roi-badge').textContent    = SECTOR_LABELS[l?.sector]||l?.sector||'—';
+
+  if(l?.meetpunten) g('roi-s-meters').value = Math.min(200,+l.meetpunten);
+
+  const d = SECTOR_DEF[l?.sector||'zorg'];
+  const kwh = d.kwh||0.108;
+  if(roiUnit==='kwh') {
+    const consKWh = (l?.mwh||600)*1000;
+    g('roi-s-cons').value  = roiValToPos(consKWh);
+    g('roi-s-price').value = Math.min(300,Math.max(1,Math.round(kwh*100)));
+  } else {
+    g('roi-s-cons').value  = roiValToPos(l?.mwh||600);
+    g('roi-s-price').value = Math.min(300,Math.max(1,Math.round(kwh*100)));
+  }
+  g('roi-s-saving').value  = d.saving;
+  g('roi-s-install').value = d.install;
+  g('roi-s-monthly').value = d.monthly;
+  g('roi-s-grid').value    = d.grid;
+  g('roi-s-comp').value    = d.comp;
+  calcROI();
+}
+
+function calcROI() {
+  const g   = id => document.getElementById(id);
+  const fK  = v=>{const r=Math.round(v);return Math.abs(r)>=1000?'€\u00a0'+(r/1000).toFixed(Math.abs(r)%1000===0?0:1).replace('.',',')+'K':'€\u00a0'+r.toLocaleString('nl-NL');};
+  const mnd = v=>Math.round(v)<120?Math.round(v)+' mnd':'> 10 jr';
+
+  const mwh     = roiGetMWh();
+  const priceMWh= roiGetPriceMWh();
+  const consRaw = roiPosToVal(+g('roi-s-cons').value);
+  const meters  = +g('roi-s-meters').value;
+  const saving  = +g('roi-s-saving').value;
+  const install = +g('roi-s-install').value;
+  const monthly = +g('roi-s-monthly').value;
+  const grid    = +g('roi-s-grid').value;
+  const comp    = +g('roi-s-comp').value;
+  const sector  = currentId ? (getLead(currentId)?.sector||'zorg') : 'zorg';
+
+  g('roi-v-meters').textContent = meters;
+  g('roi-v-cons').textContent   = consRaw.toLocaleString('nl-NL')+(roiUnit==='kwh'?' kWh':' MWh');
+  g('roi-h-cons').textContent   = roiUnit==='kwh'
+    ? `= ${Math.round(mwh).toLocaleString('nl-NL')} MWh · Klein kantoor ≈ 50k–200k kWh`
+    : `= ${Math.round(mwh*1000).toLocaleString('nl-NL')} kWh · Klein bedrijf ≈ 100–500 MWh`;
+  g('roi-v-price').textContent  = roiGetPriceDisplay();
+  g('roi-v-saving').textContent = saving+'%';
+  g('roi-v-install').textContent= fK(install);
+  g('roi-v-monthly').textContent= fK(monthly);
+  g('roi-v-comp').textContent   = fK(comp);
+
+  const eSav   = mwh*priceMWh*(saving/100);
+  const totBen = eSav+grid+comp;
+  const annCost= monthly*12;
+  const yr1    = install+annCost;
+  const pb     = totBen>0 ? Math.round(install/(totBen/12)) : 999;
+  const npv3   = totBen*3-install-annCost*3;
+  const annE   = mwh*priceMWh;
+
+  roiPayback = mnd(pb);
+  roiNPV     = fK(npv3);
+
+  g('roi-sb1').textContent = fK(eSav*.40);
+  g('roi-sb2').textContent = fK(eSav*.35);
+  g('roi-sb3').textContent = fK(eSav*.25);
+  g('roi-sbt').textContent = fK(eSav);
+
+  g('rr-saving').textContent  = fK(totBen);
+  g('rr-invest').textContent  = fK(yr1);
+  g('rr-payback').textContent = roiPayback;
+  g('rr-npv').textContent     = roiNPV;
+  const ep = g('e-payback'); if(ep) ep.textContent = roiPayback;
+
+  const vEl = g('roi-verdict');
+  let bg, ic, col, msg;
+  if(pb<=18)      { bg='#E6F4EE';ic='✓';col='#0A6640'; msg=`<strong>Uitstekende business case.</strong> Terugverdientijd van <strong>${pb} mnd</strong> — ruim onder 18 maanden. Sterk argument richting CFO. 3-jaar netto voordeel: <strong>${fK(npv3)}</strong>.`; }
+  else if(pb<=36) { bg='#E6F1FB';ic='i';col='#185FA5'; msg=`<strong>Solide business case.</strong> Terugverdientijd van <strong>${pb} mnd</strong>. Benadruk het 3-jaar netto voordeel van <strong>${fK(npv3)}</strong> en de compliance-waarde.`; }
+  else            { bg='#FFF3CD';ic='!';col='#7A4F00'; msg=`<strong>Business case versterken.</strong> Terugverdientijd van <strong>${pb} mnd</strong> is aan de lange kant. Verlaag installatiekosten of verhoog besparings%.`; }
+  vEl.style.background=bg;
+  vEl.innerHTML=`<div style="width:28px;height:28px;border-radius:50%;background:${col};color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${ic}</div><div style="font-size:13px;line-height:1.6;color:var(--text)">${msg}</div>`;
+
+  const yrs=['Jaar 1','Jaar 2','Jaar 3','Jaar 4','Jaar 5'];
+  const cum=yrs.map((_,i)=>totBen*(i+1)-install-annCost*(i+1));
+  const maxA=Math.max(...cum.map(Math.abs),1);
+  g('roi-cashflow').innerHTML=yrs.map((y,i)=>{
+    const v=cum[i],pct=Math.max(Math.round((Math.abs(v)/maxA)*100),3);
+    const c=v>=0?'#1B4F84':'#A32D2D',tc=v>=0?'#1B4F84':'#A32D2D';
+    return `<div style="display:grid;grid-template-columns:52px 1fr 84px;gap:8px;align-items:center;margin-bottom:6px"><div style="font-size:12px;color:var(--muted);font-weight:500">${y}</div><div style="height:16px;background:var(--bg);border-radius:3px;overflow:hidden;border:1px solid var(--border)"><div style="height:100%;width:${pct}%;background:${c};border-radius:3px"></div></div><div style="font-size:12px;font-weight:600;color:${tc};text-align:right;font-family:'DM Mono',monospace">${fK(v)}</div></div>`;
+  }).join('');
+
+  function donut(items) {
+    const tot=items.reduce((a,b)=>a+b.v,0)||1;
+    const r=50,cx=70,cy=70;
+    let angle=-Math.PI/2,paths='',legend='';
+    items.forEach(it=>{
+      if(it.v<=0)return;
+      const pct=it.v/tot,a1=angle,a2=angle+pct*Math.PI*2;
+      const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+      paths+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${pct>.5?1:0},1 ${x2},${y2} Z" fill="${it.c}" stroke="#fff" stroke-width="1.5"/>`;
+      angle=a2;
+    });
+    paths+=`<circle cx="${cx}" cy="${cy}" r="30" fill="white"/>`;
+    items.filter(i=>i.v>0).forEach(it=>{legend+=`<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-bottom:3px"><div style="width:10px;height:10px;border-radius:2px;background:${it.c};flex-shrink:0"></div><span>${it.l}: ${Math.round(it.v/tot*100)}%</span></div>`;});
+    return `<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap"><svg width="130" height="130" viewBox="0 0 140 140">${paths}</svg><div style="flex:1">${legend}</div></div>`;
+  }
+  g('roi-baten').innerHTML  = donut([{l:'Energiebesparing',v:eSav,c:'#002147'},{l:'Netcongestie',v:grid,c:'#1B4F84'},{l:'EED/CSRD',v:comp,c:'#00AEEF'}]);
+  g('roi-kosten').innerHTML = donut([{l:'Installatie',v:install,c:'#002147'},{l:'SLA jaar 1',v:annCost,c:'#2E75B6'}]);
+
+  const scens=[{lbl:'Pessimistisch',pct:Math.max(1,saving-5)},{lbl:'Verwacht ★',pct:saving},{lbl:'Optimistisch',pct:Math.min(30,saving+5)},{lbl:'Maximaal',pct:Math.min(30,saving+10)}];
+  g('roi-scen-body').innerHTML=scens.map((sc,i)=>{
+    const es=mwh*priceMWh*(sc.pct/100),tb=es+grid+comp,p=tb>0?Math.round(install/(tb/12)):999,n3=tb*3-install-annCost*3;
+    const pc=p<=18?'#0A6640':p<=36?'#185FA5':'#7A4F00';
+    const bold=i===1?'font-weight:700':'';
+    return `<tr style="border-bottom:1px solid var(--border);${bold}"><td style="padding:7px 12px">${sc.lbl}</td><td style="padding:7px 12px;text-align:right">${sc.pct}%</td><td style="padding:7px 12px;text-align:right;font-family:'DM Mono',monospace">${fK(es)}</td><td style="padding:7px 12px;text-align:right;font-family:'DM Mono',monospace">${fK(tb)}</td><td style="padding:7px 12px;text-align:right;color:${pc};font-weight:600">${mnd(p)}</td><td style="padding:7px 12px;text-align:right;color:${n3>=0?'#0A6640':'#A32D2D'};font-family:'DM Mono',monospace">${fK(n3)}</td></tr>`;
+  }).join('');
+
+  const d=SECTOR_DEF[sector]||SECTOR_DEF.zorg;
+  const bItems=[{lbl:'Verbruik (MWh)',you:Math.round(mwh),avg:d.bVerbruik||d.mwh,unit:'MWh',low:false},{lbl:'Besparing',you:saving,avg:d.bBesparing||d.saving,unit:'%',low:false},{lbl:'Terugverdientijd',you:Math.min(pb,60),avg:d.bPayback||20,unit:'mnd',low:true}];
+  g('roi-bench').innerHTML=bItems.map(it=>{
+    const maxV=Math.max(it.you,it.avg)*1.15||1,yp=Math.round((it.you/maxV)*100),ap=Math.round((it.avg/maxV)*100);
+    const better=it.low?it.you<=it.avg:it.you>=it.avg,yc=better?'#00AEEF':'#1B4F84';
+    return `<div style="display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center;margin-bottom:10px"><span style="font-size:12px;color:var(--muted)">${it.lbl}</span><div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px"><span style="color:${yc};font-weight:600">U: ${it.you} ${it.unit}</span><span>Gem: ${it.avg} ${it.unit}</span></div><div style="position:relative;height:9px;background:var(--bg);border-radius:3px;border:1px solid var(--border);overflow:hidden"><div style="position:absolute;height:100%;width:${ap}%;background:var(--border);border-radius:3px"></div><div style="position:absolute;height:100%;width:${yp}%;background:${yc};border-radius:3px;opacity:.9"></div></div></div></div>`;
+  }).join('');
+
+  const baseM=annE/12,savedM=eSav/12,maxM=Math.max(baseM,baseM-savedM+monthly,1);
+  const mnds=['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+  g('roi-monthly-chart').innerHTML=`<div style="margin-bottom:.75rem">${mnds.map(m=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div style="font-size:11px;color:var(--muted);width:28px;flex-shrink:0">${m}</div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="height:9px;background:var(--bg);border-radius:2px;overflow:hidden;border:1px solid var(--border)"><div style="height:100%;width:${Math.round((baseM/maxM)*100)}%;background:#002147;border-radius:2px"></div></div><div style="height:9px;background:var(--bg);border-radius:2px;overflow:hidden;border:1px solid var(--border)"><div style="height:100%;width:${Math.round(((baseM-savedM+monthly)/maxM)*100)}%;background:#00AEEF;border-radius:2px"></div></div></div><div style="font-size:10px;color:var(--muted);width:60px;text-align:right;font-family:'DM Mono',monospace">${fK(baseM-savedM+monthly)}</div></div>`).join('')}</div><div style="display:flex;gap:1.5rem;font-size:11px;color:var(--muted)"><span><span style="display:inline-block;width:10px;height:10px;background:#002147;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Vóór: ${fK(baseM)}/mnd</span><span><span style="display:inline-block;width:10px;height:10px;background:#00AEEF;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Ná incl. SLA: ${fK(baseM-savedM+monthly)}/mnd</span></div>`;
+}
+
+function roiSaveHTML() {
+  const html = document.documentElement.outerHTML;
+  const blob = new Blob([html],{type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const l    = currentId ? getLead(currentId) : null;
+  const naam = (l?.company||'imbema-roi').replace(/[^a-z0-9]/gi,'-').toLowerCase();
+  a.href=url; a.download=naam+'-roi-berekening.html'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function saveROI() {
+  if(currentId) {
+    db.roiResults[currentId] = {payback:roiPayback, npv:roiNPV, ts:Date.now()};
+    save();
+    const l = getLead(currentId);
+    if(l && (l.status==='nieuw'||l.status==='gekwalificeerd')) { l.status='schouw'; save(); renderPipeline(); }
+    toast('ROI-resultaat opgeslagen in dossier');
+  } else {
+    toast('Sla eerst een lead op');
+  }
+}
+
+function refreshERP() {
+  const l = currentId ? getLead(currentId) : null;
+  document.getElementById('e-company').textContent    = l?.company||'—';
+  document.getElementById('e-contact').textContent    = l?.contact||'—';
+  document.getElementById('e-sector').textContent     = SECTOR_LABELS[l?.sector]||'—';
+  document.getElementById('e-meetpunten').textContent = l?.meetpunten ? l.meetpunten+' meetpunten' : '—';
+  document.getElementById('e-media').textContent      = MEDIA_LABELS[l?.media]||'—';
+  document.getElementById('e-payback').textContent    = roiPayback;
+  const nr = currentId ? 'IB-2026-'+String(currentId+100).padStart(3,'0') : '—';
+  document.getElementById('e-ordernr').textContent    = nr;
+}
+
+function tickTask(idx) {
+  taskState[idx] = !taskState[idx];
+  const el = document.getElementById('et'+idx);
+  if(el) el.classList.toggle('done', !!taskState[idx]);
+  updateTaskProgress();
+  saveERP();
+}
+
+function updateTaskProgress() {
+  const done = Object.values(taskState).filter(Boolean).length;
+  document.getElementById('e-progress').textContent = done+' / 8 voltooid';
+  document.getElementById('e-progbar').style.width = Math.round((done/8)*100)+'%';
+}
+
+function saveERP() {
+  if(!currentId) return;
+  db.erpData[currentId] = {
+    tasks: {...taskState},
+    start: document.getElementById('e-start').value,
+    end:   document.getElementById('e-end').value,
+    pm:    document.getElementById('e-pm').value,
+    note:  document.getElementById('e-note').value,
+    fac1:  document.getElementById('e-fac1').value,
+    fac2:  document.getElementById('e-fac2').value,
+  };
+  save();
+}
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+function toggleView() {
+  showTable = !showTable;
+  document.getElementById('pipeline-view').style.display = showTable?'none':'block';
+  document.getElementById('table-view').style.display    = showTable?'block':'none';
+  event.target.textContent = showTable ? 'Kanban weergave' : 'Tabelweergave';
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+function buildRapport() {
+  const fK = v=>{const r=Math.round(v);return r>=1000?'€ '+(r/1000).toFixed(Math.abs(r)%1000===0?0:1).replace('.',',')+'K':'€ '+r.toLocaleString('nl-NL');};
+  const leads = db.leads;
+  const active = leads.filter(l=>l.status!=='verloren');
+
+  const colLabels = {'nieuw':'Nieuw','gekwalificeerd':'Gekwalificeerd','schouw':'Schouw / ROI gereed','voorstel':'Voorstel uitgebracht','gesloten-won':'Gesloten','verloren':'Verloren'};
+
+  const totalVal    = active.reduce((s,l)=>s+(+l.orderwaarde||0),0);
+  const totalMtr    = active.reduce((s,l)=>s+(+l.meetpunten||0),0);
+  const totalMWh    = active.reduce((s,l)=>s+(+l.mwh||0),0);
+  const convRate    = active.length ? Math.round((active.filter(l=>l.status==='gesloten-won').length/active.length)*100) : 0;
+
+  document.getElementById('rp-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Actieve leads</div><div class="kpi-value">${active.length}</div><div class="kpi-sub">excl. verloren</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pijplijnwaarde</div><div class="kpi-value">${fK(totalVal)}</div><div class="kpi-sub">indicatief totaal</div></div>
+    <div class="kpi-card"><div class="kpi-label">Conversie naar order</div><div class="kpi-value">${convRate}%</div><div class="kpi-sub">leads → order/ERP</div></div>
+    <div class="kpi-card accent"><div class="kpi-label">Totaal meetpunten</div><div class="kpi-value">${totalMtr}</div><div class="kpi-sub">${Math.round(totalMWh).toLocaleString('nl-NL')} MWh/jr</div></div>`;
+
+  function makeBars(el, items, col) {
+    const max = Math.max(...items.map(i=>i.val),1);
+    document.getElementById(el).innerHTML = items.map(i=>{
+      const pct = Math.max(Math.round((i.val/max)*100),4);
+      const colHex = col||i.col||'#1B4F84';
+      return `<div class="bar-h"><div class="bar-h-lbl">${i.lbl}</div><div class="bar-h-track"><div class="bar-h-fill" style="width:${pct}%;background:${colHex}"><span class="bar-h-val">${i.num||i.val}</span></div></div></div>`;
+    }).join('');
+  }
+
+  const phaseCols   = ['nieuw','gekwalificeerd','schouw','voorstel','gesloten-won'];
+  const phaseColors = {'nieuw':'#5A7A96','gekwalificeerd':'#1B4F84','schouw':'#BA7517','voorstel':'#185FA5','gesloten-won':'#0A6640'};
+  makeBars('rp-pipeline-bars', phaseCols.map(s=>({lbl:colLabels[s],val:leads.filter(l=>l.status===s).length,num:leads.filter(l=>l.status===s).length+' leads',col:phaseColors[s]})));
+
+  const sectors = [...new Set(active.map(l=>l.sector))];
+  makeBars('rp-sector-bars', sectors.map(s=>({lbl:SECTOR_LABELS[s]||s, val:active.filter(l=>l.sector===s).length, num:active.filter(l=>l.sector===s).length+' leads', col:'#002147'})));
+
+  makeBars('rp-value-bars', phaseCols.map(s=>{
+    const v = leads.filter(l=>l.status===s).reduce((sum,l)=>sum+(+l.orderwaarde||0),0);
+    return {lbl:colLabels[s], val:v, num:fK(v), col:phaseColors[s]};
+  }).filter(i=>i.val>0));
+
+  const bronnen = ['referral','linkedin','event','inbound','outbound',''];
+  const bronLabels = {referral:'Referral',linkedin:'LinkedIn',event:'Event/beurs',inbound:'Inbound',outbound:'Outbound','':'Onbekend'};
+  makeBars('rp-bron-bars', bronnen.map(b=>({lbl:bronLabels[b], val:active.filter(l=>(l.bron||'')===b).length, num:active.filter(l=>(l.bron||'')===b).length+' leads', col:'#1B4F84'})).filter(i=>i.val>0));
+
+  const roiLeads = active.filter(l=>db.roiResults[l.id]);
+  if(roiLeads.length) {
+    const max = Math.max(...roiLeads.map(l=>parseInt(db.roiResults[l.id].payback)||0),1);
+    document.getElementById('rp-roi-bars').innerHTML = roiLeads.map(l=>{
+      const r = db.roiResults[l.id];
+      const pb = parseInt(r.payback)||0;
+      const pct = Math.max(Math.round((pb/Math.max(max,1))*100),4);
+      const col = pb<=18?'#0A6640':pb<=36?'#1B4F84':'#BA7517';
+      return `<div class="bar-h"><div class="bar-h-lbl" style="font-size:11px">${l.company.substring(0,16)}</div><div class="bar-h-track"><div class="bar-h-fill" style="width:${pct}%;background:${col}"><span class="bar-h-val">${r.payback}</span></div></div></div>`;
+    }).join('');
+  } else {
+    document.getElementById('rp-roi-bars').innerHTML = '<div style="font-size:13px;color:var(--muted);padding:1rem 0">Nog geen ROI-berekeningen opgeslagen. Open een lead, bereken de ROI en sla op.</div>';
+  }
+
+  const erpLeads = active.filter(l=>db.erpData[l.id]);
+  if(erpLeads.length) {
+    document.getElementById('rp-erp-bars').innerHTML = erpLeads.map(l=>{
+      const tasks = db.erpData[l.id].tasks||{};
+      const done = Object.values(tasks).filter(Boolean).length;
+      const pct = Math.round((done/8)*100);
+      const col = pct===100?'#0A6640':pct>50?'#1B4F84':'#002147';
+      return `<div class="bar-h"><div class="bar-h-lbl" style="font-size:11px">${l.company.substring(0,16)}</div><div class="bar-h-track"><div class="bar-h-fill" style="width:${Math.max(pct,4)}%;background:${col}"><span class="bar-h-val">${done}/8 taken</span></div></div></div>`;
+    }).join('');
+  } else {
+    document.getElementById('rp-erp-bars').innerHTML = '<div style="font-size:13px;color:var(--muted);padding:1rem 0">Nog geen ERP-orders aangemaakt.</div>';
+  }
+
+  const tbody = document.getElementById('rp-tbody');
+  tbody.innerHTML = leads.map(l=>{
+    const roi = db.roiResults[l.id];
+    const erp = db.erpData[l.id];
+    const done = erp ? Object.values(erp.tasks||{}).filter(Boolean).length : null;
+    return `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:9px 10px;font-size:13px;font-weight:500">${l.company}</td>
+      <td style="padding:9px 10px;font-size:13px;color:var(--muted)">${SECTOR_LABELS[l.sector]||l.sector}</td>
+      <td style="padding:9px 10px"><span class="badge badge-${l.status}">${colLabels[l.status]||l.status}</span></td>
+      <td style="padding:9px 10px;font-size:13px;text-align:right;font-family:'DM Mono',monospace">${l.orderwaarde?fK(+l.orderwaarde):'—'}</td>
+      <td style="padding:9px 10px;font-size:13px;text-align:right">${l.meetpunten||'—'}</td>
+      <td style="padding:9px 10px;font-size:13px;text-align:right">${l.mwh||'—'}</td>
+      <td style="padding:9px 10px;font-size:13px;text-align:center;color:${roi?'#0A6640':'var(--muted)'}">${roi?roi.payback:'—'}</td>
+      <td style="padding:9px 10px;font-size:13px;text-align:center;color:${done!=null?'#0A6640':'var(--muted)'}">${done!=null?done+'/8':'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══ SCHOUWFORMULIER ══════════════════════════════════════════════════════════
+
+const SCHOUW_FIELDS = [
+  'sc-gebouwtype','sc-bouwjaar','sc-verdiepingen','sc-units','sc-adres','sc-gebouw-opmerking',
+  'sc-elektra','sc-gas','sc-warmte','sc-water','sc-stoom','sc-pv',
+  'sc-e-aansluiting','sc-e-fases','sc-e-verbruik','sc-e-dinrail','sc-e-locatie',
+  'sc-g-type','sc-g-verbruik','sc-g-evhi',
+  'sc-w-bron','sc-w-dn','sc-w-vloeistof','sc-w-inloop','sc-w-afsluiter',
+  'sc-wat-type','sc-wat-verbruik',
+  'sc-bestaand','sc-mid','sc-merk','sc-meter-jaar',
+  'sc-proto-mbus','sc-proto-modbus','sc-proto-wmbus','sc-proto-puls','sc-proto-lora','sc-proto-geen',
+  'sc-uitlezing',
+  'sc-mp-elektra','sc-mp-gas','sc-mp-warmte','sc-mp-water',
+  'sc-bereikbaar','sc-mp-opmerking',
+  'sc-comm-gewenst','sc-netwerk','sc-gateway','sc-ems','sc-ems-type',
+  'sc-eigenaar','sc-moment','sc-onderhoud','sc-toegang',
+  'sc-vvb-exzone','sc-vvb-vochtig','sc-vvb-buiten','sc-vvb-borg',
+  'sc-complexiteit','sc-duur','sc-conclusie','sc-uitvoerder','sc-datum'
+];
+
+function toggleMedia(media) {
+  const cb = document.getElementById('sc-'+media);
+  const det = document.getElementById('detail-'+media);
+  if(det) det.style.display = cb && cb.checked ? 'block' : 'none';
+  // highlight checkbox label
+  const lbl = document.getElementById('lbl-'+media);
+  if(lbl) {
+    lbl.style.borderColor = cb && cb.checked ? '#00AEEF' : 'var(--border)';
+    lbl.style.background  = cb && cb.checked ? '#E6F6FD' : 'var(--bg)';
+  }
+}
+
+function updateMPTotal() {
+  const e = +document.getElementById('sc-mp-elektra').value||0;
+  const g = +document.getElementById('sc-mp-gas').value||0;
+  const w = +document.getElementById('sc-mp-warmte').value||0;
+  const wa= +document.getElementById('sc-mp-water').value||0;
+  document.getElementById('sc-mp-total').textContent = e+g+w+wa;
+}
+
+function schouwSync() {
+  if(!currentId) return;
+  const data = {};
+  SCHOUW_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.type==='checkbox') data[id] = el.checked;
+    else data[id] = el.value;
+  });
+  if(!db.schouwData) db.schouwData = {};
+  db.schouwData[currentId] = data;
+  save();
+  updateSchouwProgress();
+}
+
+function updateSchouwProgress() {
+  const filledIds = ['sc-gebouwtype','sc-elektra','sc-gas','sc-warmte','sc-water',
+    'sc-bestaand','sc-mid','sc-mp-elektra','sc-mp-gas','sc-mp-warmte','sc-mp-water',
+    'sc-comm-gewenst','sc-complexiteit','sc-conclusie','sc-datum'];
+  let filled = 0;
+  filledIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const v = el.type==='checkbox' ? el.checked : el.value.trim();
+    if(v && v !== '') filled++;
+  });
+  const pct = Math.round((filled / filledIds.length) * 100);
+  const bar = document.getElementById('schouw-prog-bar');
+  const lbl = document.getElementById('schouw-prog-label');
+  if(bar) bar.style.width = pct+'%';
+  if(lbl) lbl.textContent = pct+'% ingevuld';
+}
+
+function loadSchouwData(id) {
+  if(!db.schouwData) db.schouwData = {};
+  const data = db.schouwData[id] || {};
+  SCHOUW_FIELDS.forEach(fid => {
+    const el = document.getElementById(fid);
+    if(!el) return;
+    if(el.type==='checkbox') {
+      el.checked = !!data[fid];
+    } else {
+      el.value = data[fid] || '';
+    }
+  });
+  // Restore media detail panels and highlights
+  ['elektra','gas','warmte','water'].forEach(m => toggleMedia(m));
+  updateMPTotal();
+  updateSchouwProgress();
+
+  // Set lead name in header
+  const l = getLead(id);
+  const nameEl = document.getElementById('schouw-lead-name');
+  if(nameEl) nameEl.textContent = l ? 'Schouw voor: '+l.company : 'Geen lead geselecteerd';
+}
+
+function saveSchouw() {
+  schouwSync();
+  // Push meetpunten + verbruik terug naar lead
+  if(currentId) {
+    const l = getLead(currentId);
+    if(l) {
+      const mpTotal = +document.getElementById('sc-mp-total').textContent || 0;
+      const eVerbruik = +document.getElementById('sc-e-verbruik').value || 0;
+      if(mpTotal > 0) l.meetpunten = mpTotal;
+      if(eVerbruik > 0) l.mwh = Math.round(eVerbruik / 1000) || l.mwh;
+      save();
+      renderPipeline();
+      updateKPIs();
+    }
+    // Auto-advance status to schouw
+    const l2 = getLead(currentId);
+    if(l2 && (l2.status==='nieuw'||l2.status==='gekwalificeerd')) {
+      l2.status='schouw'; save(); renderPipeline();
+    }
+  }
+  toast('Schouw opgeslagen — meetpunten bijgewerkt in lead');
+}
+
+function schouwNaarROI() {
+  saveSchouw();
+  refreshROI();
+  showPage('roi', document.querySelectorAll('.nav-btn')[3]);
+}
+
+function schouwNaarERP() {
+  saveSchouw();
+  refreshERP();
+  showPage('erp', document.querySelectorAll('.nav-btn')[4]);
+}
+
+function printSchouw() {
+  window.print();
+}
+
+// ══ LOGIN ═════════════════════════════════════════════════════════════════════
+
+// Gebruikers: { gebruikersnaam: 'gehashed-wachtwoord' }
+// Wachtwoorden zijn gehashed met SHA-256 zodat ze niet in plaintext staan.
+// Standaard accounts:
+//   admin     / imbema2026
+//   sales     / imbema2026
+//   manager   / imbema2026
+// Voeg accounts toe door het object USERS uit te breiden met een nieuw
+// sha256-gehashed wachtwoord. Hash genereren: https://emn178.github.io/online-tools/sha256.html
+
+const USERS = {
+  'admin':   'a1b9a7d78ccec90b30c2c2af55dbb20a11b1d7b9b5f8e88f3a17d0c8e1e6d5c3',
+  'sales':   'a1b9a7d78ccec90b30c2c2af55dbb20a11b1d7b9b5f8e88f3a17d0c8e1e6d5c3',
+  'manager': 'a1b9a7d78ccec90b30c2c2af55dbb20a11b1d7b9b5f8e88f3a17d0c8e1e6d5c3',
+};
+// Bovenstaande hash = SHA-256 van 'imbema2026'
+// Om een eigen wachtwoord toe te voegen: hash het via de link hierboven en vervang de string.
+
+const SESSION_KEY = 'imbema_crm_session';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function doLogin() {
+  const user = document.getElementById('login-user').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  if(!user || !pass) { errEl.style.display='block'; errEl.textContent='Vul gebruikersnaam en wachtwoord in.'; return; }
+  const hashed = await sha256(pass);
+  if(USERS[user] && USERS[user] === hashed) {
+    sessionStorage.setItem(SESSION_KEY, user);
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('topbar-user').textContent = user;
+    errEl.style.display = 'none';
+  } else {
+    errEl.style.display = 'block';
+    errEl.textContent = 'Onjuiste gebruikersnaam of wachtwoord.';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+function togglePw() {
+  const p = document.getElementById('login-pass');
+  p.type = p.type === 'password' ? 'text' : 'password';
+}
+
+function doLogout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-user').focus();
+}
+
+function checkSession() {
+  const user = sessionStorage.getItem(SESSION_KEY);
+  if(user && USERS[user]) {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('topbar-user').textContent = user;
+    return true;
+  }
+  return false;
+}
+
+// ══ END LOGIN ═════════════════════════════════════════════════════════════════
+
+load();
+</script>
+</body>
+</html>
